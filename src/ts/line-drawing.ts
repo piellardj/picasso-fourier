@@ -41,7 +41,7 @@ class LineDrawing {
         for (let i = 0; i <= fullUntil; i++) {
             context.lineTo(this.points[i].x, this.points[i].y);
         }
-       
+
         const finalPoint = this.computePoint(t);
         context.lineTo(finalPoint.x, finalPoint.y);
 
@@ -53,8 +53,13 @@ class LineDrawing {
         const integrationPrecision = 1000;
         const precision = 1 / integrationPrecision;
 
-        const coefsPositive: FourierCoefficient[] = [];
-        for (let n = 0; n <= order; n++) {
+        const coefficients: FourierCoefficient[] = [];
+        for (let i = 0; i < 2 * order + 1; i++) {
+            let n = Math.floor((i + 1) / 2);
+            if (i > 0 && i % 2 === 0) {
+                n *= -1;
+            }
+
             let cx = 0, cy = 0;
 
             for (let i = 0; i < integrationPrecision; i++) {
@@ -68,28 +73,14 @@ class LineDrawing {
                 cy += precision * (value.y * cos - value.x * sin);
             }
 
-            coefsPositive.push(LineDrawing.computePhaseAndMagniture(cx, cy));
+            coefficients.push({
+                magnitude: Math.sqrt(cx * cx + cy * cy),
+                phase: Math.atan2(cy, cx),
+                n,
+            });
         }
 
-        const coefsNegative: FourierCoefficient[] = [];
-        for (let n = -1; n >= -order; n--) {
-            let cx = 0, cy = 0;
-
-            for (let i = 0; i < integrationPrecision; i++) {
-                const t = (i + 0.5) * precision;
-                const TWO_PI_N_T = 2 * Math.PI * n * t;
-                const cos = Math.cos(TWO_PI_N_T);
-                const sin = Math.sin(TWO_PI_N_T);
-
-                const value = this.computePoint(t);
-                cx += precision * (value.x * cos + value.y * sin);
-                cy += precision * (value.y * cos - value.x * sin);
-            }
-
-            coefsNegative.push(LineDrawing.computePhaseAndMagniture(cx, cy));
-        }
-
-        return new FourierSeries(coefsPositive, coefsNegative);
+        return new FourierSeries(coefficients);
     }
 
     /* Assumes t is between 0 and 1 included. */
@@ -98,15 +89,6 @@ class LineDrawing {
         const floorIndex = Math.floor(index);
 
         return LineDrawing.interpolate(this.points[floorIndex], this.points[floorIndex + 1], index - floorIndex);
-    }
-
-    private static computePhaseAndMagniture(x: number, y: number): FourierCoefficient {
-        return {
-            magnitude: Math.sqrt(x * x + y * y),
-            phase: Math.atan2(y, x),
-            x,
-            y,
-        };
     }
 
     /* Assumes t is between 0 and 1 included. */

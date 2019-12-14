@@ -3,17 +3,14 @@ import Point from "./point";
 type FourierCoefficient = {
     magnitude: number;
     phase: number;
-    x: number;
-    y: number;
+    n: number;
 }
 
 class FourierSeries {
-    private readonly _coefficientsPositive: FourierCoefficient[];
-    private readonly _coefficientsNegative: FourierCoefficient[];
+    private readonly _coefficients: FourierCoefficient[];
 
-    public constructor(coefficientsPositive: FourierCoefficient[], coefficientsNegative: FourierCoefficient[]) {
-        this._coefficientsPositive = coefficientsPositive;
-        this._coefficientsNegative = coefficientsNegative;
+    public constructor(coefficients: FourierCoefficient[]) {
+        this._coefficients = coefficients;
     }
 
     /* Assumes t is between 0 and 1 included. */
@@ -22,18 +19,10 @@ class FourierSeries {
 
         const TWO_PI = 2 * Math.PI;
 
-        for (let n = 0; n < this._coefficientsPositive.length; n++) {
-            const TWO_PI_N_T = TWO_PI * n * t;
-
-            let coefficient = this._coefficientsPositive[n];
-            x += coefficient.magnitude * Math.cos(TWO_PI * n * t + coefficient.phase);
-            y += coefficient.magnitude * Math.sin(TWO_PI * n * t + coefficient.phase);
-
-            if (n < this._coefficientsNegative.length) {
-                coefficient = this._coefficientsNegative[n];
-                x += coefficient.magnitude * Math.cos(TWO_PI * (-n - 1) * t + coefficient.phase);
-                y += coefficient.magnitude * Math.sin(TWO_PI * (-n - 1) * t + coefficient.phase);
-            }
+        for (const coefficient of this._coefficients) {
+            const TWO_PI_N_T = TWO_PI * coefficient.n * t;
+            x += coefficient.magnitude * Math.cos(TWO_PI_N_T + coefficient.phase);
+            y += coefficient.magnitude * Math.sin(TWO_PI_N_T + coefficient.phase);
         }
 
         return { x, y };
@@ -46,18 +35,10 @@ class FourierSeries {
 
         const TWO_PI = 2 * Math.PI;
 
-        for (let n = 0; n < this._coefficientsPositive.length; n++) {
-            const TWO_PI_N_T = TWO_PI * n * t;
-
-            let coefficient = this._coefficientsPositive[n];
-            x += coefficient.magnitude * Math.cos(TWO_PI * n * t + coefficient.phase);
-            y += coefficient.magnitude * Math.sin(TWO_PI * n * t + coefficient.phase);
-
-            if (n < this._coefficientsNegative.length) {
-                coefficient = this._coefficientsNegative[n];
-                x += coefficient.magnitude * Math.cos(TWO_PI * (-n - 1) * t + coefficient.phase);
-                y += coefficient.magnitude * Math.sin(TWO_PI * (-n - 1) * t + coefficient.phase);
-            }
+        for (const coefficient of this._coefficients) {
+            const TWO_PI_N_T = TWO_PI * coefficient.n * t;
+            x += coefficient.magnitude * Math.cos(TWO_PI_N_T + coefficient.phase);
+            y += coefficient.magnitude * Math.sin(TWO_PI_N_T + coefficient.phase);
 
             context.lineTo(x, y);
         }
