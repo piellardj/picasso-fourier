@@ -1,4 +1,6 @@
 import LineDrawing from "./line-drawing";
+import Point from "./point";
+import { FourierSeries } from "./fourier-series";
 
 function main() {
     const canvas = document.getElementById("canvas") as HTMLCanvasElement;
@@ -6,10 +8,13 @@ function main() {
 
     canvas.width = 512;//canvas.clientWidth;
     canvas.height = 512;//canvas.clientHeight;
-    context.strokeStyle = "white";
-    context.lineWidth = 1.5;
+    context.lineWidth = 1;
+
+    const animationLength = 5000; // in milliseconds
 
     const drawing = new LineDrawing();
+    const fourier: FourierSeries = drawing.computeFourierSeries(5);
+    let fourierPoints: Point[] = [];
 
     let startTimestamp: DOMHighResTimeStamp = null;
     function mainLoop(timestamp: DOMHighResTimeStamp) {
@@ -19,14 +24,29 @@ function main() {
 
         context.clearRect(0, 0, canvas.width, canvas.height);
 
-        let t = (timestamp - startTimestamp) / 5000;
-        t = t % 1;
-        
+        let t = (timestamp - startTimestamp) / animationLength;
+        if (t > 1) {
+            startTimestamp = timestamp;
+            t = 0;
+            fourierPoints = [];
+        }
+
+        fourierPoints.push(fourier.computePoint(t));
+
+        context.strokeStyle = "white";
+        context.beginPath();
+        context.moveTo(fourierPoints[0].x, fourierPoints[0].y);
+        for (let i = 0; i < fourierPoints.length; i++) {
+            context.lineTo(fourierPoints[i].x, fourierPoints[i].y);
+        }
+        context.stroke();
+        context.closePath();
+
+        context.strokeStyle = "green";
         drawing.draw(context, t);
 
-        context.beginPath();
-        context.arc(400, 400, 75, 0, 2 * Math.PI);
-        context.stroke();
+        context.strokeStyle = "red";
+        fourier.drawPathToPoint(context, t);
 
         requestAnimationFrame(mainLoop);
     }
