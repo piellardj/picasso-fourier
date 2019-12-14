@@ -53,6 +53,23 @@ class LineDrawing {
         const integrationPrecision = 1000;
         const precision = 1 / integrationPrecision;
 
+        /* Precompute function samples to avoid computing them for each coefficient. */
+        type FunctionSample = {
+            x: number,
+            y: number,
+            two_pi_t: number, // t is where the drawing was evaluated
+        };
+        const samples: FunctionSample[] = [];
+        for (let i = 0; i < integrationPrecision; i++) {
+            const t = (i + 0.5) * precision;
+            const point = this.computePoint(t);
+            samples.push({
+                x: point.x,
+                y: point.y,
+                two_pi_t: 2 * Math.PI * t,
+            });
+        }
+
         const coefficients: FourierCoefficient[] = [];
         for (let i = 0; i < 2 * order + 1; i++) {
             let n = Math.floor((i + 1) / 2);
@@ -61,16 +78,13 @@ class LineDrawing {
             }
 
             let cx = 0, cy = 0;
+            for (const sample of samples) {
+                const two_pi_n_t = n * sample.two_pi_t;
+                const cos = Math.cos(two_pi_n_t);
+                const sin = Math.sin(two_pi_n_t);
 
-            for (let i = 0; i < integrationPrecision; i++) {
-                const t = (i + 0.5) * precision;
-                const TWO_PI_N_T = 2 * Math.PI * n * t;
-                const cos = Math.cos(TWO_PI_N_T);
-                const sin = Math.sin(TWO_PI_N_T);
-                const value = this.computePoint(t);
-
-                cx += precision * (value.x * cos + value.y * sin);
-                cy += precision * (value.y * cos - value.x * sin);
+                cx += precision * (sample.x * cos + sample.y * sin);
+                cy += precision * (sample.y * cos - sample.x * sin);
             }
 
             coefficients.push({
