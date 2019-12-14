@@ -1,0 +1,29 @@
+{
+  "name": "picasso-fourier",
+  "version": "0.0.1",
+  "homepage": "https://piellardj.github.io/picasso-fourier",
+  "description": "DESCRIPTION_placeholder",
+  "main": "build/index.js",
+  "scripts": {
+    "build-page": "node src/generate-page.js",
+    "build": "npm run build-page && npm run webpack",
+    "clean": "shx rm -rf docs/*",
+    "lint": "tslint -c src/config/tslint.json -p src/config/tsconfig.json",
+    "pre-commit": "npm run lint && npm run rebuild",
+    "rebuild": "npm run clean && npm run build",
+    "webpack": "webpack --config src/config/webpack.config.js --output docs/script/main.min.js"
+  },
+  "author": "“Jérémie PIELLARD <jeremie.piellard@gmail.com> (https://github.com/piellardj)",
+  "repository": "github:piellardj/picasso-fourier",
+  "license": "ISC",
+  "devDependencies": {
+    "fs-extra": "^8.1.0",
+    "shx": "^0.3.2",
+    "ts-loader": "^6.2.1",
+    "tslint": "^5.20.1",
+    "typescript": "^3.7.3",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.10",
+    "webpage-templates": "github:piellardj/webpage-templates"
+  }
+}

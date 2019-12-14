@@ -1,0 +1,19 @@
+{
+    "title": "Picasso - Fourier",
+    "description": "ͯPLACEHOLDER DESCRIPTION",
+    "introduction": [
+        "PLACEHOLDER INTRODUCTION"
+    ],
+    "githubProjectName": "picasso-fourier",
+    "additionalLinks": [],
+    "scriptFiles": [
+        "script/main.min.js"
+    ],
+    "indicators": [],
+    "canvas": {
+        "width": 512,
+        "height": 512,
+        "enableFullscreen": true
+    },
+    "controlsSections": []
+}
