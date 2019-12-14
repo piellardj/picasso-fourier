@@ -48,6 +48,9 @@ function main() {
         context.strokeStyle = "red";
         fourier.drawPathToPoint(context, t);
 
+        context.strokeStyle = "yellow";
+        fourier.drawCircles(context, t);
+
         requestAnimationFrame(mainLoop);
     }
 
