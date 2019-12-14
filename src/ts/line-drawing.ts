@@ -1,5 +1,6 @@
 import { FourierCoefficient, FourierSeries } from "./fourier-series";
 import Point from "./point";
+import * as Presets from "./presets";
 
 class LineDrawing {
     private readonly points: Point[];
@@ -8,26 +9,7 @@ class LineDrawing {
     public constructor() {
         this.points = [];
 
-        const N = 50;
-        const R = 100;
-        const C = 200;
-        for (let i = 0; i < N; i++) {
-            const angle = 2 * Math.PI * i / N;
-            this.points.push({
-                x: C + R * Math.cos(angle) + 50 * Math.cos(2 * angle),
-                y: C + R * Math.sin(angle) + 50 * Math.cos(2 * angle),
-            });
-        }
-        this.points.push({
-            x: C + R + 50,
-            y: C + 0,
-        });
-
-        // this.points.push({ x: 100, y: 100 });
-        // this.points.push({ x: 400, y: 100 });
-        // this.points.push({ x: 100, y: 400 });
-        // this.points.push({ x: 100, y: 100 });
-
+        this.points = Presets.Dog;
         this.nbPoints = this.points.length - 1;
     }
 

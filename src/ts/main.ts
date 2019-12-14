@@ -10,10 +10,10 @@ function main() {
     canvas.height = 512;//canvas.clientHeight;
     context.lineWidth = 1;
 
-    const animationLength = 5000; // in milliseconds
+    const animationLength = 10000; // in milliseconds
 
     const drawing = new LineDrawing();
-    const fourier: FourierSeries = drawing.computeFourierSeries(5);
+    const fourier: FourierSeries = drawing.computeFourierSeries(100);
     let fourierPoints: Point[] = [];
 
     let startTimestamp: DOMHighResTimeStamp = null;
@@ -33,6 +33,9 @@ function main() {
 
         fourierPoints.push(fourier.computePoint(t));
 
+        context.strokeStyle = "rgba(255,255,255,0.1)";
+        fourier.drawCircles(context, t);
+
         context.strokeStyle = "white";
         context.beginPath();
         context.moveTo(fourierPoints[0].x, fourierPoints[0].y);
@@ -47,9 +50,6 @@ function main() {
 
         context.strokeStyle = "red";
         fourier.drawPathToPoint(context, t);
-
-        context.strokeStyle = "yellow";
-        fourier.drawCircles(context, t);
 
         requestAnimationFrame(mainLoop);
     }
