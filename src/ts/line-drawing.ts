@@ -13,12 +13,22 @@ class LineDrawing {
 
     private readonly points: IPoint[];
     private readonly nbPoints: number;
+    private readonly pathLength: number;
 
     public constructor() {
         this.points = [];
 
         this.points = Presets.Dog;
         this.nbPoints = this.points.length - 1;
+
+        this.pathLength = 0;
+        let diffX;
+        let diffY;
+        for (let i = 0; i < this.points.length - 2; i++) {
+            diffX = this.points[i].x - this.points[i + 1].x;
+            diffY = this.points[i].y - this.points[i + 1].y;
+            this.pathLength += Math.sqrt(diffX * diffX + diffY * diffY);
+        }
     }
 
     /* Assumes t is between 0 and 1 included. */
@@ -40,7 +50,7 @@ class LineDrawing {
     }
 
     public computeFourierSeries(order: number): FourierSeries {
-        const integrationPrecision = 1000;
+        const integrationPrecision = Math.ceil(this.pathLength);
         const precision = 1 / integrationPrecision;
 
         /* Precompute function samples to avoid computing them for each coefficient. */
