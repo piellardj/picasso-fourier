@@ -15,5 +15,29 @@
         "height": 512,
         "enableFullscreen": true
     },
-    "controlsSections": []
+    "controlsSections": [
+        {
+            "title": "Display",
+            "controls": [
+                {
+                    "title": "Circles",
+                    "type": "checkbox",
+                    "id": "circles-checkbox-id",
+                    "checked": true
+                },
+                {
+                    "title": "Segments",
+                    "type": "checkbox",
+                    "id": "segments-checkbox-id",
+                    "checked": true
+                },
+                {
+                    "title": "Curve",
+                    "type": "checkbox",
+                    "id": "curve-checkbox-id",
+                    "checked": true
+                }
+            ]
+        }
+    ]
 }

@@ -2,6 +2,8 @@ import LineDrawing from "./line-drawing";
 import Point from "./point";
 import { FourierSeries } from "./fourier-series";
 
+import { Parameters } from "./parameters";
+
 function main() {
     const canvas = document.getElementById("canvas") as HTMLCanvasElement;
     const context = canvas.getContext("2d") as CanvasRenderingContext2D;
@@ -33,23 +35,29 @@ function main() {
 
         fourierPoints.push(fourier.computePoint(t));
 
-        context.strokeStyle = "rgba(255,255,255,0.1)";
-        fourier.drawCircles(context, t);
-
-        context.strokeStyle = "white";
-        context.beginPath();
-        context.moveTo(fourierPoints[0].x, fourierPoints[0].y);
-        for (let i = 0; i < fourierPoints.length; i++) {
-            context.lineTo(fourierPoints[i].x, fourierPoints[i].y);
+        if (Parameters.displayCircles) {
+            context.strokeStyle = "rgba(255,255,255,0.3)";
+            fourier.drawCircles(context, t);
         }
-        context.stroke();
-        context.closePath();
 
-        context.strokeStyle = "green";
-        drawing.draw(context, t);
+        if (Parameters.displayCurve) {
+            context.strokeStyle = "white";
+            context.beginPath();
+            context.moveTo(fourierPoints[0].x, fourierPoints[0].y);
+            for (let i = 0; i < fourierPoints.length; i++) {
+                context.lineTo(fourierPoints[i].x, fourierPoints[i].y);
+            }
+            context.stroke();
+            context.closePath();
+        }
 
-        context.strokeStyle = "red";
-        fourier.drawPathToPoint(context, t);
+        // context.strokeStyle = "green";
+        // drawing.draw(context, t);
+
+        if (Parameters.displaySegments) {
+            context.strokeStyle = "red";
+            fourier.drawPathToPoint(context, t);
+        }
 
         requestAnimationFrame(mainLoop);
     }
