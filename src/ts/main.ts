@@ -15,29 +15,33 @@ function main() {
     const animationLength = 10000; // in milliseconds
 
     const drawing = new LineDrawing();
-    const fourier: FourierSeries = drawing.computeFourierSeries(100);
+    const fourier: FourierSeries = drawing.computeFourierSeries(300);
     let fourierPoints: IPoint[] = [];
+
+    let needToRestart: boolean = true;
+    Parameters.clearObservers.push(() => needToRestart = true);
 
     let startTimestamp: DOMHighResTimeStamp = null;
     function mainLoop(timestamp: DOMHighResTimeStamp) {
-        if (startTimestamp === null) {
-            startTimestamp = timestamp;
-        }
-
-        context.clearRect(0, 0, canvas.width, canvas.height);
-
         let t = (timestamp - startTimestamp) / animationLength;
         if (t > 1) {
+            needToRestart = true;
+        }
+
+        if (needToRestart) {
+            needToRestart = false;
             startTimestamp = timestamp;
             t = 0;
             fourierPoints = [];
         }
 
-        fourierPoints.push(fourier.computePoint(t));
+        context.clearRect(0, 0, canvas.width, canvas.height);
+
+        fourierPoints.push(fourier.computePoint(Parameters.order, t));
 
         if (Parameters.displayCircles) {
             context.strokeStyle = "rgba(255,255,255,0.3)";
-            fourier.drawCircles(context, t);
+            fourier.drawCircles(context, Parameters.order, t);
         }
 
         if (Parameters.displayCurve) {
@@ -56,7 +60,7 @@ function main() {
 
         if (Parameters.displaySegments) {
             context.strokeStyle = "red";
-            fourier.drawPathToPoint(context, t);
+            fourier.drawPathToPoint(context, Parameters.order, t);
         }
 
         requestAnimationFrame(mainLoop);
