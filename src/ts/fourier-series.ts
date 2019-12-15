@@ -46,11 +46,17 @@ class FourierSeries {
     }
 
     public drawCircles(context: CanvasRenderingContext2D, t: number): void {
-        let x = 0, y = 0;
-        context.beginPath();
+        function drawCircle(centerX: number, centerY: number, radius: number) {
+            context.beginPath();
+            context.arc(centerX, centerY, radius, 0, TWO_PI);
+            context.closePath();
+            context.stroke();
+        }
 
+        let x = 0, y = 0;
+        
         for (const coefficient of this._coefficients) {
-            context.arc(x, y, coefficient.magnitude, 0, TWO_PI);
+            drawCircle(x, y, coefficient.magnitude);
 
             const TWO_PI_N_T = TWO_PI * coefficient.n * t;
             x += coefficient.magnitude * Math.cos(TWO_PI_N_T + coefficient.phase);
@@ -59,11 +65,8 @@ class FourierSeries {
 
         if (this._coefficients.length > 1) {
             const lastCoefficient = this._coefficients[this._coefficients.length - 1];
-            context.arc(x, y, lastCoefficient.magnitude, 0, TWO_PI);
+            drawCircle(x, y, lastCoefficient.magnitude);
         }
-
-        context.stroke();
-        context.closePath();
     }
 }
 
