@@ -9,7 +9,12 @@
     "scriptFiles": [
         "script/main.min.js"
     ],
-    "indicators": [],
+    "indicators": [
+        {
+            "id": "fourier-order",
+            "label": "Approximation order"
+        }
+    ],
     "canvas": {
         "width": 512,
         "height": 512,
