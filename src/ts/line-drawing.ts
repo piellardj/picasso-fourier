@@ -20,8 +20,8 @@ class LineDrawing {
     private readonly points: IPoint[];
     public readonly pathLength: number;
 
-    public constructor() {
-        this.points = Presets.Dog;
+    public constructor(points: IPoint[]) {
+        this.points = points;
 
         this.pathLength = 0;
         for (let i = 0; i < this.points.length - 1; i++) {
@@ -55,9 +55,7 @@ class LineDrawing {
                 break;
             }
         }
-
-        console.log(i + " current: " + currentLength + " / " + desiredLength);
-
+        
         context.stroke();
         context.closePath();
     }

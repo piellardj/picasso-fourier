@@ -4,6 +4,8 @@ import IPoint from "./point";
 
 import { Parameters } from "./parameters";
 
+import { EPreset, Presets } from "./presets";
+
 declare const Canvas: any;
 
 function main() {
@@ -14,8 +16,8 @@ function main() {
     canvas.height = 512;
     context.lineWidth = 1;
 
-    const drawing = new LineDrawing();
-    const fourier: FourierSeries = drawing.computeFourierSeries(300);
+    let drawing: LineDrawing;
+    let fourier: FourierSeries;
     let fourierPoints: IPoint[] = [];
 
     let animationLength: number; // in milliseconds
@@ -59,8 +61,8 @@ function main() {
             context.closePath();
         }
 
-        // context.strokeStyle = "green";
-        // drawing.draw(context, t);
+        context.strokeStyle = "green";
+        drawing.draw(context, t);
 
         if (Parameters.displaySegments) {
             context.strokeStyle = "red";
@@ -70,7 +72,12 @@ function main() {
         requestAnimationFrame(mainLoop);
     }
 
-    requestAnimationFrame(mainLoop);
+    Presets.getPreset(EPreset.ARLEQUIN, (points: IPoint[]) => {
+        drawing = new LineDrawing(points);
+        fourier = drawing.computeFourierSeries(300);
+
+        requestAnimationFrame(mainLoop);
+    });
 }
 
 main();

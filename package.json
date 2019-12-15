@@ -6,8 +6,9 @@
   "main": "build/index.js",
   "scripts": {
     "build-page": "node src/generate-page.js",
-    "build": "npm run build-page && npm run webpack",
+    "build": "npm run build-page && npm run webpack && npm run copy-resources",
     "clean": "shx rm -rf docs/*",
+    "copy-resources": "shx cp -r src/resources docs/resources",
     "lint": "tslint -c src/config/tslint.json -p src/config/tsconfig.json",
     "pre-commit": "npm run lint && npm run rebuild",
     "rebuild": "npm run clean && npm run build",
