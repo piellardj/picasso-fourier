@@ -14,11 +14,11 @@ function main() {
     canvas.height = 512;
     context.lineWidth = 1;
 
-    const animationLength = 10000; // in milliseconds
-
     const drawing = new LineDrawing();
     const fourier: FourierSeries = drawing.computeFourierSeries(300);
     let fourierPoints: IPoint[] = [];
+
+    let animationLength: number; // in milliseconds
 
     let needToRestart: boolean = true;
     Parameters.clearObservers.push(() => needToRestart = true);
@@ -32,6 +32,7 @@ function main() {
 
         if (needToRestart) {
             needToRestart = false;
+            animationLength = 1000 * drawing.pathLength / (Parameters.speed + 0.001);
             startTimestamp = timestamp;
             t = 0;
             fourierPoints = [];

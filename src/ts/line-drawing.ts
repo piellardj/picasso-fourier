@@ -13,7 +13,7 @@ class LineDrawing {
 
     private readonly points: IPoint[];
     private readonly nbPoints: number;
-    private readonly pathLength: number;
+    public readonly pathLength: number;
 
     public constructor() {
         this.points = [];

@@ -13,6 +13,7 @@ const controlId = {
     DISPLAY_SEGMENTS: "segments-checkbox-id",
     DISPLAY_CURVE: "curve-checkbox-id",
     ORDER: "order-range-id",
+    SPEED: "speed-range-id",
 };
 
 /* === OBSERVERS ====================================================== */
@@ -70,6 +71,14 @@ class Parameters {
         Range.setValue(controlId.ORDER, o);
     }
 
+    public static get speed(): number {
+        return speed;
+    }
+    public static set speed(s: number) {
+        speed = s;
+        Range.setValue(controlId.SPEED, s);
+    }
+
     public static get clearObservers(): GenericObserver[] {
         return observers.clear;
     }
@@ -98,6 +107,12 @@ Checkbox.addObserver(controlId.DISPLAY_CURVE, (checked: boolean) => {
 let order: number = Range.getValue(controlId.ORDER);
 Range.addObserver(controlId.ORDER, (o: number) => {
     order = o;
+    callObservers(observers.clear);
+});
+
+let speed: number = Range.getValue(controlId.SPEED);
+Range.addObserver(controlId.SPEED, (s: number) => {
+    speed = s;
     callObservers(observers.clear);
 });
 
