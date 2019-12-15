@@ -1,6 +1,6 @@
-import Point from "./point";
+import IPoint from "./point";
 
-type FourierCoefficient = {
+interface IFourierCoefficient {
     magnitude: number;
     phase: number;
     n: number;
@@ -9,15 +9,16 @@ type FourierCoefficient = {
 const TWO_PI = 2 * Math.PI;
 
 class FourierSeries {
-    private readonly _coefficients: FourierCoefficient[];
+    private readonly _coefficients: IFourierCoefficient[];
 
-    public constructor(coefficients: FourierCoefficient[]) {
+    public constructor(coefficients: IFourierCoefficient[]) {
         this._coefficients = coefficients;
     }
 
     /* Assumes t is between 0 and 1 included. */
-    public computePoint(t: number): Point {
-        let x = 0, y = 0;
+    public computePoint(t: number): IPoint {
+        let x = 0;
+        let y = 0;
 
         for (const coefficient of this._coefficients) {
             const TWO_PI_N_T = TWO_PI * coefficient.n * t;
@@ -29,7 +30,8 @@ class FourierSeries {
     }
 
     public drawPathToPoint(context: CanvasRenderingContext2D, t: number): void {
-        let x = 0, y = 0;
+        let x = 0;
+        let y = 0;
         context.beginPath();
         context.moveTo(x, y);
 
@@ -53,8 +55,9 @@ class FourierSeries {
             context.stroke();
         }
 
-        let x = 0, y = 0;
-        
+        let x = 0;
+        let y = 0;
+
         for (const coefficient of this._coefficients) {
             drawCircle(x, y, coefficient.magnitude);
 
@@ -71,6 +74,6 @@ class FourierSeries {
 }
 
 export {
-    FourierCoefficient,
+    IFourierCoefficient,
     FourierSeries,
 };

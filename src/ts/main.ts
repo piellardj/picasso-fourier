@@ -1,6 +1,6 @@
-import LineDrawing from "./line-drawing";
-import Point from "./point";
 import { FourierSeries } from "./fourier-series";
+import LineDrawing from "./line-drawing";
+import IPoint from "./point";
 
 import { Parameters } from "./parameters";
 
@@ -8,15 +8,15 @@ function main() {
     const canvas = document.getElementById("canvas") as HTMLCanvasElement;
     const context = canvas.getContext("2d") as CanvasRenderingContext2D;
 
-    canvas.width = 512;//canvas.clientWidth;
-    canvas.height = 512;//canvas.clientHeight;
+    canvas.width = 512;
+    canvas.height = 512;
     context.lineWidth = 1;
 
     const animationLength = 10000; // in milliseconds
 
     const drawing = new LineDrawing();
     const fourier: FourierSeries = drawing.computeFourierSeries(100);
-    let fourierPoints: Point[] = [];
+    let fourierPoints: IPoint[] = [];
 
     let startTimestamp: DOMHighResTimeStamp = null;
     function mainLoop(timestamp: DOMHighResTimeStamp) {
@@ -44,8 +44,8 @@ function main() {
             context.strokeStyle = "white";
             context.beginPath();
             context.moveTo(fourierPoints[0].x, fourierPoints[0].y);
-            for (let i = 0; i < fourierPoints.length; i++) {
-                context.lineTo(fourierPoints[i].x, fourierPoints[i].y);
+            for (const point of fourierPoints) {
+                context.lineTo(point.x, point.y);
             }
             context.stroke();
             context.closePath();
