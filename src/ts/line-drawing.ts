@@ -18,14 +18,28 @@ class LineDrawing {
     }
 
     private readonly points: IPoint[];
-    public readonly pathLength: number;
-
+    private readonly extendedPathLength: number; // length of the actual path, potentially extended to make it periodic
+    public readonly pathLength: number; // length of the input path
+    
     public constructor(points: IPoint[]) {
         this.points = points;
 
         this.pathLength = 0;
         for (let i = 0; i < this.points.length - 1; i++) {
             this.pathLength += LineDrawing.distance(this.points[i], this.points[i + 1]);
+        }
+
+        this.extendedPathLength = this.pathLength;
+
+        // For Fourier series computing, artificially make the path periodic
+        const firstPoint = this.points[0];
+        const lastPoint = this.points[this.points.length - 1];
+        if (firstPoint.x !== lastPoint.x || firstPoint.y !== lastPoint.y) {
+            this.extendedPathLength += LineDrawing.distance(lastPoint, firstPoint);
+            this.points.push({
+                x: firstPoint.x,
+                y: firstPoint.y,
+            });
         }
     }
 
@@ -61,8 +75,8 @@ class LineDrawing {
     }
 
     public computeFourierSeries(order: number): FourierSeries {
-        const nbSteps = Math.ceil(0.5 * this.pathLength); // number of integration steps
-        const stepSize = this.pathLength / nbSteps;
+        const nbSteps = Math.ceil(0.5 * this.extendedPathLength); // number of integration steps
+        const stepSize = this.extendedPathLength / nbSteps;
         const dT = 1 / nbSteps;
 
         /* Precompute function samples to avoid computing them for each coefficient. */
@@ -127,7 +141,7 @@ class LineDrawing {
             });
         }
 
-        return new FourierSeries(coefficients);
+        return new FourierSeries(coefficients, this.pathLength / this.extendedPathLength);
     }
 }
 

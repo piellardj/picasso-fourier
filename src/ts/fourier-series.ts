@@ -10,15 +10,19 @@ const TWO_PI = 2 * Math.PI;
 
 class FourierSeries {
     private readonly _coefficients: IFourierCoefficient[];
+    private readonly _length: number;
 
-    public constructor(coefficients: IFourierCoefficient[]) {
+    public constructor(coefficients: IFourierCoefficient[], length: number) {
         this._coefficients = coefficients;
+        this._length = length;
     }
 
     /* Assumes t is between 0 and 1 included. */
     public computePoint(order: number, t: number): IPoint {
         let x = 0;
         let y = 0;
+
+        t = this.computeRealT(t);
 
         const max = this.computeAmountOfCoefficients(order);
         for (let i = 0; i < max; i++) {
@@ -34,6 +38,9 @@ class FourierSeries {
     public drawPathToPoint(context: CanvasRenderingContext2D, order: number, t: number): void {
         let x = 0;
         let y = 0;
+
+        t = this.computeRealT(t);
+
         context.beginPath();
         context.moveTo(x, y);
 
@@ -59,6 +66,8 @@ class FourierSeries {
             context.stroke();
         }
 
+        t = this.computeRealT(t);
+
         let x = 0;
         let y = 0;
 
@@ -75,6 +84,10 @@ class FourierSeries {
 
     private computeAmountOfCoefficients(order: number): number {
         return Math.min(this._coefficients.length, 1 + 2 * order);
+    }
+
+    private computeRealT(t: number): number {
+        return t * this._length;
     }
 }
 
