@@ -10,6 +10,7 @@ declare const Tabs: any;
 /* === IDs ============================================================ */
 const controlId = {
     SPEED: "speed-range-id",
+    LOOP: "loop-checkbox-id",
     RESET: "reset-button-id",
     DISPLAY_CIRCLES: "circles-checkbox-id",
     DISPLAY_SEGMENTS: "segments-checkbox-id",
@@ -40,6 +41,16 @@ class Parameters {
     public static set speed(s: number) {
         speed = s;
         Range.setValue(controlId.SPEED, s);
+    }
+
+    public static get loop(): boolean {
+        return loop;
+    }
+    public static set loop(l: boolean) {
+        if (loop !== l) {
+            loop = l;
+            Checkbox.setChecked(controlId.LOOP, l);
+        }
     }
 
     public static get displayCircles(): boolean {
@@ -93,6 +104,11 @@ class Parameters {
 let speed: number = Range.getValue(controlId.SPEED);
 Range.addObserver(controlId.SPEED, (s: number) => {
     speed = s;
+});
+
+let loop: boolean = Checkbox.isChecked(controlId.LOOP);
+Checkbox.addObserver(controlId.LOOP, (checked: boolean) => {
+    loop = checked;
 });
 
 Button.addObserver(controlId.RESET, () => callObservers(observers.clear));

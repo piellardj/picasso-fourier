@@ -35,6 +35,8 @@ function main() {
             const animationLength = 1000 * drawing.pathLength / (Parameters.speed + 0.001);
             t += dT / animationLength;
             fourierPoints.push(fourier.computePoint(Parameters.order, t));
+        } else if (Parameters.loop) {
+            needToRestart = true;
         }
 
         if (needToRestart) {

@@ -25,13 +25,19 @@
             "title": "Animation",
             "controls": [
                 {
-                    "title": "Loop speed",
+                    "title": "Speed",
                     "type": "range",
                     "id": "speed-range-id",
                     "min": 1,
                     "max": 500,
                     "value": 50,
                     "step": 1
+                },
+                {
+                    "title": "Loop",
+                    "type": "checkbox",
+                    "id": "loop-checkbox-id",
+                    "checked": false
                 },
                 {
                     "type": "button",
