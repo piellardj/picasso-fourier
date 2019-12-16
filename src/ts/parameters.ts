@@ -9,11 +9,11 @@ declare const Tabs: any;
 
 /* === IDs ============================================================ */
 const controlId = {
+    SPEED: "speed-range-id",
     DISPLAY_CIRCLES: "circles-checkbox-id",
     DISPLAY_SEGMENTS: "segments-checkbox-id",
     DISPLAY_CURVE: "curve-checkbox-id",
     ORDER: "order-range-id",
-    SPEED: "speed-range-id",
 };
 
 /* === OBSERVERS ====================================================== */
@@ -33,6 +33,14 @@ const observers: {
 
 /* === INTERFACE ====================================================== */
 class Parameters {
+    public static get speed(): number {
+        return speed;
+    }
+    public static set speed(s: number) {
+        speed = s;
+        Range.setValue(controlId.SPEED, s);
+    }
+
     public static get displayCircles(): boolean {
         return displayCircles;
     }
@@ -71,14 +79,6 @@ class Parameters {
         Range.setValue(controlId.ORDER, o);
     }
 
-    public static get speed(): number {
-        return speed;
-    }
-    public static set speed(s: number) {
-        speed = s;
-        Range.setValue(controlId.SPEED, s);
-    }
-
     public static get clearObservers(): GenericObserver[] {
         return observers.clear;
     }
@@ -89,6 +89,12 @@ class Parameters {
 /* === EVENTS BINDING ================================================= */
 
 /* --- PARAMETERS ----------------------------------------------------- */
+let speed: number = Range.getValue(controlId.SPEED);
+Range.addObserver(controlId.SPEED, (s: number) => {
+    speed = s;
+    callObservers(observers.clear);
+});
+
 let displayCircles: boolean = Checkbox.isChecked(controlId.DISPLAY_CIRCLES);
 Checkbox.addObserver(controlId.DISPLAY_CIRCLES, (checked: boolean) => {
     displayCircles = checked;
@@ -107,12 +113,6 @@ Checkbox.addObserver(controlId.DISPLAY_CURVE, (checked: boolean) => {
 let order: number = Range.getValue(controlId.ORDER);
 Range.addObserver(controlId.ORDER, (o: number) => {
     order = o;
-    callObservers(observers.clear);
-});
-
-let speed: number = Range.getValue(controlId.SPEED);
-Range.addObserver(controlId.SPEED, (s: number) => {
-    speed = s;
     callObservers(observers.clear);
 });
 
