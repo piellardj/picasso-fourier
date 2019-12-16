@@ -32,6 +32,12 @@
                     "max": 500,
                     "value": 50,
                     "step": 1
+                },
+                {
+                    "type": "button",
+                    "id": "reset-button-id",
+                    "label": "Reset",
+                    "flat": true
                 }
             ]
         },

@@ -10,6 +10,7 @@ declare const Tabs: any;
 /* === IDs ============================================================ */
 const controlId = {
     SPEED: "speed-range-id",
+    RESET: "reset-button-id",
     DISPLAY_CIRCLES: "circles-checkbox-id",
     DISPLAY_SEGMENTS: "segments-checkbox-id",
     DISPLAY_CURVE: "curve-checkbox-id",
@@ -93,6 +94,8 @@ let speed: number = Range.getValue(controlId.SPEED);
 Range.addObserver(controlId.SPEED, (s: number) => {
     speed = s;
 });
+
+Button.addObserver(controlId.RESET, () => callObservers(observers.clear));
 
 let displayCircles: boolean = Checkbox.isChecked(controlId.DISPLAY_CIRCLES);
 Checkbox.addObserver(controlId.DISPLAY_CIRCLES, (checked: boolean) => {
