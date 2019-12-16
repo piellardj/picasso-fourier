@@ -92,7 +92,6 @@ class Parameters {
 let speed: number = Range.getValue(controlId.SPEED);
 Range.addObserver(controlId.SPEED, (s: number) => {
     speed = s;
-    callObservers(observers.clear);
 });
 
 let displayCircles: boolean = Checkbox.isChecked(controlId.DISPLAY_CIRCLES);

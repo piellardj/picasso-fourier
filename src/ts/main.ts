@@ -25,17 +25,20 @@ function main() {
     let needToRestart: boolean = true;
     Parameters.clearObservers.push(() => needToRestart = true);
 
-    let startTimestamp: DOMHighResTimeStamp = null;
+    let lastUpdate: DOMHighResTimeStamp = null;
+    let t = 0;
     function mainLoop(timestamp: DOMHighResTimeStamp) {
-        let t = (timestamp - startTimestamp) / animationLength;
-        if (t > 1) {
-            needToRestart = true;
+        const dT = (lastUpdate) ? timestamp - lastUpdate : 0;
+        lastUpdate = timestamp;
+
+        if (t < 1) {
+            const animationLength = 1000 * drawing.pathLength / (Parameters.speed + 0.001);
+            t += dT / animationLength;
+            fourierPoints.push(fourier.computePoint(Parameters.order, t));
         }
 
         if (needToRestart) {
             needToRestart = false;
-            animationLength = 1000 * drawing.pathLength / (Parameters.speed + 0.001);
-            startTimestamp = timestamp;
             t = 0;
             fourierPoints = [];
             Canvas.setIndicatorText("fourier-order", Parameters.order.toLocaleString());
