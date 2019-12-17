@@ -17,10 +17,10 @@ class LineDrawing {
         return Math.sqrt(dX * dX + dY * dY);
     }
 
+    public readonly pathLength: number; // length of the input path
     private readonly points: IPoint[];
     private readonly extendedPathLength: number; // length of the actual path, potentially extended to make it periodic
-    public readonly pathLength: number; // length of the input path
-    
+
     public constructor(points: IPoint[]) {
         this.points = points;
 
@@ -69,7 +69,7 @@ class LineDrawing {
                 break;
             }
         }
-        
+
         context.stroke();
         context.closePath();
     }

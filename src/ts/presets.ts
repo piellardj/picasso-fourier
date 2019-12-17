@@ -8,10 +8,6 @@ enum EPreset {
 }
 
 class Presets {
-    private static cache: {
-        [propName: string]: IPoint[];
-    };
-
     public static getPreset(preset: EPreset, callback: (array: IPoint[]) => any): void {
         if (typeof Presets.cache === "undefined") {
             Presets.cache = {};
@@ -22,7 +18,7 @@ class Presets {
 
         const xhr = new XMLHttpRequest();
 
-        xhr.addEventListener('readystatechange', function () {
+        xhr.addEventListener("readystatechange", () => {
             if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
                 const retrievedArray = Presets.tryParsePointsArray(xhr.responseText);
 
@@ -33,9 +29,13 @@ class Presets {
             }
         });
 
-        xhr.open('GET', 'resources/' + preset + ".txt");
+        xhr.open("GET", "resources/" + preset + ".txt");
         xhr.send(null);
     }
+
+    private static cache: {
+        [propName: string]: IPoint[];
+    };
 
     private static tryParsePointsArray(text: string): IPoint[] | null {
         if (!text) {
