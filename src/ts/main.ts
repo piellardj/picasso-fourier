@@ -20,6 +20,36 @@ function main() {
     let fourier: FourierSeries;
     let fourierPoints: IPoint[] = [];
 
+    function display(): void {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        
+        if (Parameters.displayCircles) {
+            context.strokeStyle = "rgba(255,255,255,0.3)";
+            fourier.drawCircles(context, Parameters.order, t);
+        }
+
+        if (Parameters.displayCurve && fourierPoints.length >= 2) {
+            context.strokeStyle = "white";
+            context.beginPath();
+            context.moveTo(fourierPoints[0].x, fourierPoints[0].y);
+            for (const point of fourierPoints) {
+                context.lineTo(point.x, point.y);
+            }
+            context.stroke();
+            context.closePath();
+        }
+
+        if (Parameters.displayOriginalCurve) {
+            context.strokeStyle = "green";
+            drawing.draw(context, t);
+        }
+
+        if (Parameters.displaySegments) {
+            context.strokeStyle = "red";
+            fourier.drawPathToPoint(context, Parameters.order, t);
+        }
+    }
+
     let needToRestart: boolean = true;
     Parameters.clearObservers.push(() => needToRestart = true);
 
@@ -44,35 +74,9 @@ function main() {
             Canvas.setIndicatorText("fourier-order", Parameters.order.toLocaleString());
         }
 
-        context.clearRect(0, 0, canvas.width, canvas.height);
-
         fourierPoints.push(fourier.computePoint(Parameters.order, t));
 
-        if (Parameters.displayCircles) {
-            context.strokeStyle = "rgba(255,255,255,0.3)";
-            fourier.drawCircles(context, Parameters.order, t);
-        }
-
-        if (Parameters.displayCurve) {
-            context.strokeStyle = "white";
-            context.beginPath();
-            context.moveTo(fourierPoints[0].x, fourierPoints[0].y);
-            for (const point of fourierPoints) {
-                context.lineTo(point.x, point.y);
-            }
-            context.stroke();
-            context.closePath();
-        }
-
-        if (Parameters.displayOriginalCurve) {
-            context.strokeStyle = "green";
-            drawing.draw(context, t);
-        }
-
-        if (Parameters.displaySegments) {
-            context.strokeStyle = "red";
-            fourier.drawPathToPoint(context, Parameters.order, t);
-        }
+        display();
 
         requestAnimationFrame(mainLoop);
     }
