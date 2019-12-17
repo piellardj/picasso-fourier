@@ -76,6 +76,12 @@
                     "type": "checkbox",
                     "id": "curve-checkbox-id",
                     "checked": true
+                },
+                {
+                    "title": "Original curve",
+                    "type": "checkbox",
+                    "id": "original-curve-checkbox-id",
+                    "checked": false
                 }
             ]
         }

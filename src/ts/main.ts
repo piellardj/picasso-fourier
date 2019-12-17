@@ -20,8 +20,6 @@ function main() {
     let fourier: FourierSeries;
     let fourierPoints: IPoint[] = [];
 
-    let animationLength: number; // in milliseconds
-
     let needToRestart: boolean = true;
     Parameters.clearObservers.push(() => needToRestart = true);
 
@@ -66,8 +64,10 @@ function main() {
             context.closePath();
         }
 
-        context.strokeStyle = "green";
-        drawing.draw(context, t);
+        if (Parameters.displayOriginalCurve) {
+            context.strokeStyle = "green";
+            drawing.draw(context, t);
+        }
 
         if (Parameters.displaySegments) {
             context.strokeStyle = "red";

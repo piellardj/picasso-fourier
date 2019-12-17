@@ -15,6 +15,7 @@ const controlId = {
     DISPLAY_CIRCLES: "circles-checkbox-id",
     DISPLAY_SEGMENTS: "segments-checkbox-id",
     DISPLAY_CURVE: "curve-checkbox-id",
+    DISPLAY_ORIGINAL_CURVE: "original-curve-checkbox-id",
     ORDER: "order-range-id",
 };
 
@@ -83,6 +84,16 @@ class Parameters {
         }
     }
 
+    public static get displayOriginalCurve(): boolean {
+        return displayOriginalCurve;
+    }
+    public static set displayOriginalCurve(display: boolean) {
+        if (displayOriginalCurve !== display) {
+            displayOriginalCurve = display;
+            Checkbox.setChecked(controlId.DISPLAY_ORIGINAL_CURVE, display);
+        }
+    }
+
     public static get order(): number {
         return order;
     }
@@ -126,6 +137,11 @@ Checkbox.addObserver(controlId.DISPLAY_SEGMENTS, (checked: boolean) => {
 let displayCurve: boolean = Checkbox.isChecked(controlId.DISPLAY_CURVE);
 Checkbox.addObserver(controlId.DISPLAY_CURVE, (checked: boolean) => {
     displayCurve = checked;
+});
+
+let displayOriginalCurve: boolean = Checkbox.isChecked(controlId.DISPLAY_ORIGINAL_CURVE);
+Checkbox.addObserver(controlId.DISPLAY_ORIGINAL_CURVE, (checked: boolean) => {
+    displayOriginalCurve = checked;
 });
 
 let order: number = Range.getValue(controlId.ORDER);
