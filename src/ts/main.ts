@@ -22,7 +22,7 @@ function main() {
 
     function display(): void {
         context.clearRect(0, 0, canvas.width, canvas.height);
-        
+
         if (Parameters.displayCircles) {
             context.strokeStyle = "rgba(255,255,255,0.3)";
             fourier.drawCircles(context, Parameters.order, t);
@@ -53,6 +53,9 @@ function main() {
     let needToRestart: boolean = true;
     Parameters.clearObservers.push(() => needToRestart = true);
 
+    let needToRedraw: boolean = true;
+    Parameters.redrawObservers.push(() => needToRedraw = true);
+
     let lastUpdate: DOMHighResTimeStamp = null;
     let t = 0;
     function mainLoop(timestamp: DOMHighResTimeStamp) {
@@ -74,10 +77,11 @@ function main() {
             Canvas.setIndicatorText("fourier-order", Parameters.order.toLocaleString());
         }
 
-        fourierPoints.push(fourier.computePoint(Parameters.order, t));
+        if (needToRedraw) {
+            display();
+        }
 
-        display();
-
+        needToRedraw = t < 1;
         requestAnimationFrame(mainLoop);
     }
 

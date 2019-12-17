@@ -30,8 +30,10 @@ function callObservers(observersList: any[]): void {
 
 const observers: {
     clear: GenericObserver[];
+    redraw: GenericObserver[];
 } = {
     clear: [],
+    redraw: [],
 };
 
 /* === INTERFACE ====================================================== */
@@ -105,6 +107,9 @@ class Parameters {
     public static get clearObservers(): GenericObserver[] {
         return observers.clear;
     }
+    public static get redrawObservers(): GenericObserver[] {
+        return observers.redraw;
+    }
 
     private constructor() {}
 }
@@ -127,21 +132,25 @@ Button.addObserver(controlId.RESET, () => callObservers(observers.clear));
 let displayCircles: boolean = Checkbox.isChecked(controlId.DISPLAY_CIRCLES);
 Checkbox.addObserver(controlId.DISPLAY_CIRCLES, (checked: boolean) => {
     displayCircles = checked;
+    callObservers(observers.redraw);
 });
 
 let displaySegments: boolean = Checkbox.isChecked(controlId.DISPLAY_SEGMENTS);
 Checkbox.addObserver(controlId.DISPLAY_SEGMENTS, (checked: boolean) => {
     displaySegments = checked;
+    callObservers(observers.redraw);
 });
 
 let displayCurve: boolean = Checkbox.isChecked(controlId.DISPLAY_CURVE);
 Checkbox.addObserver(controlId.DISPLAY_CURVE, (checked: boolean) => {
     displayCurve = checked;
+    callObservers(observers.redraw);
 });
 
 let displayOriginalCurve: boolean = Checkbox.isChecked(controlId.DISPLAY_ORIGINAL_CURVE);
 Checkbox.addObserver(controlId.DISPLAY_ORIGINAL_CURVE, (checked: boolean) => {
     displayOriginalCurve = checked;
+    callObservers(observers.redraw);
 });
 
 let order: number = Range.getValue(controlId.ORDER);
