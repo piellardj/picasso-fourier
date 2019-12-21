@@ -1,6 +1,6 @@
 import { FourierSeries, IFourierCoefficient } from "./fourier-series";
+import { Parameters } from "./parameters";
 import IPoint from "./point";
-import * as Presets from "./presets";
 
 class LineDrawing {
     /* Assumes t is between 0 and 1 included. */
@@ -75,7 +75,7 @@ class LineDrawing {
     }
 
     public computeFourierSeries(order: number): FourierSeries {
-        const nbSteps = Math.ceil(0.5 * this.extendedPathLength); // number of integration steps
+        const nbSteps = Math.ceil(Parameters.integrationPrecision * this.extendedPathLength);
         const stepSize = this.extendedPathLength / nbSteps;
         const dT = 1 / nbSteps;
 

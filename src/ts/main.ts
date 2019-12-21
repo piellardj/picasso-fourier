@@ -59,7 +59,7 @@ function main() {
     let needToRedraw: boolean = true;
     Parameters.redrawObservers.push(() => needToRedraw = true);
 
-    let wantedLength = 2000; // milliseconds
+    const wantedLength = 2000; // milliseconds
     function mainLoop() {
         let t = clock.current / wantedLength;
 

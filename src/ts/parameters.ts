@@ -107,6 +107,11 @@ class Parameters {
         Range.setValue(controlId.ORDER, o);
     }
 
+    public static get integrationPrecision(): number {
+        const integrationStepSize = 1; // one space-unit per integration step
+        return 1 / integrationStepSize;
+    }
+
     public static get clearObservers(): GenericObserver[] {
         return observers.clear;
     }
@@ -127,7 +132,7 @@ let speed: number = Range.getValue(controlId.SPEED);
 Range.addObserver(controlId.SPEED, (s: number) => {
     const previous = speed;
     speed = s;
-    
+
     for (const observer of observers.speedChange) {
         observer(previous);
     }
