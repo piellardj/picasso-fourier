@@ -1,4 +1,5 @@
 import { FourierSeries } from "./fourier-series";
+import Line from "./line";
 import LineDrawing from "./line-drawing";
 import IPoint from "./point";
 
@@ -19,7 +20,7 @@ function main() {
 
     let drawing: LineDrawing;
     let fourier: FourierSeries;
-    let fourierPoints: IPoint[] = [];
+    let fourierCurve: Line;
 
     function display(t: number): void {
         context.clearRect(0, 0, canvas.width, canvas.height);
@@ -29,15 +30,9 @@ function main() {
             fourier.drawCircles(context, Parameters.order, t);
         }
 
-        if (Parameters.displayCurve && fourierPoints.length >= 2) {
+        if (Parameters.displayCurve && fourierCurve) {
             context.strokeStyle = "white";
-            context.beginPath();
-            context.moveTo(fourierPoints[0].x, fourierPoints[0].y);
-            for (const point of fourierPoints) {
-                context.lineTo(point.x, point.y);
-            }
-            context.stroke();
-            context.closePath();
+            fourierCurve.draw(context, t);
         }
 
         if (Parameters.displayOriginalCurve) {
@@ -63,9 +58,7 @@ function main() {
     function mainLoop() {
         let t = clock.current / wantedLength;
 
-        if (t < 1) {
-            fourierPoints.push(fourier.computePoint(Parameters.order, t));
-        } else if (Parameters.loop) {
+        if (t >= 1 && Parameters.loop) {
             needToRestart = true;
         }
 
@@ -73,8 +66,16 @@ function main() {
             needToRestart = false;
             clock.reset();
             t = 0;
-            fourierPoints = [];
             Canvas.setIndicatorText("fourier-order", Parameters.order.toLocaleString());
+
+            const nbPoints = Math.max(2, Math.ceil(Parameters.curvePrecision * drawing.pathLength));
+            const fourierPoints: IPoint[] = [];
+            for (let iP = 0; iP < nbPoints; iP++) {
+                let iT: number = iP / (nbPoints + 1);
+                let point: IPoint = fourier.computePoint(Parameters.order, iT);
+                fourierPoints.push(point);
+            }
+            fourierCurve = new Line(fourierPoints);
         }
 
         if (needToRedraw) {

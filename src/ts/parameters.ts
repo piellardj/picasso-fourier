@@ -112,6 +112,11 @@ class Parameters {
         return 1 / integrationStepSize;
     }
 
+    public static get curvePrecision(): number {
+        const stepSize = 2; // sampling every two space-units
+        return 1 / stepSize;
+    }
+
     public static get clearObservers(): GenericObserver[] {
         return observers.clear;
     }
