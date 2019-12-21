@@ -2,6 +2,7 @@ import { FourierSeries } from "./fourier-series";
 import LineDrawing from "./line-drawing";
 import IPoint from "./point";
 
+import Clock from "./clock";
 import { Parameters } from "./parameters";
 
 import { EPreset, Presets } from "./presets";
@@ -20,7 +21,7 @@ function main() {
     let fourier: FourierSeries;
     let fourierPoints: IPoint[] = [];
 
-    function display(): void {
+    function display(t: number): void {
         context.clearRect(0, 0, canvas.width, canvas.height);
 
         if (Parameters.displayCircles) {
@@ -50,21 +51,19 @@ function main() {
         }
     }
 
+    const clock = new Clock();
+
     let needToRestart: boolean = true;
     Parameters.clearObservers.push(() => needToRestart = true);
 
     let needToRedraw: boolean = true;
     Parameters.redrawObservers.push(() => needToRedraw = true);
 
-    let lastUpdate: DOMHighResTimeStamp = null;
-    let t = 0;
-    function mainLoop(timestamp: DOMHighResTimeStamp) {
-        const dT = (lastUpdate) ? timestamp - lastUpdate : 0;
-        lastUpdate = timestamp;
+    let wantedLength = 2000; // milliseconds
+    function mainLoop() {
+        let t = clock.current / wantedLength;
 
         if (t < 1) {
-            const animationLength = 1000 * drawing.pathLength / (Parameters.speed + 0.001);
-            t += dT / animationLength;
             fourierPoints.push(fourier.computePoint(Parameters.order, t));
         } else if (Parameters.loop) {
             needToRestart = true;
@@ -72,13 +71,14 @@ function main() {
 
         if (needToRestart) {
             needToRestart = false;
+            clock.reset();
             t = 0;
             fourierPoints = [];
             Canvas.setIndicatorText("fourier-order", Parameters.order.toLocaleString());
         }
 
         if (needToRedraw) {
-            display();
+            display(t);
         }
 
         needToRedraw = t < 1;
@@ -88,6 +88,7 @@ function main() {
     Presets.getPreset(EPreset.ARLEQUIN, (points: IPoint[]) => {
         drawing = new LineDrawing(points);
         fourier = drawing.computeFourierSeries(300);
+        clock.reset();
 
         requestAnimationFrame(mainLoop);
     });

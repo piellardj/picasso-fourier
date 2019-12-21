@@ -21,6 +21,7 @@ const controlId = {
 
 /* === OBSERVERS ====================================================== */
 type GenericObserver = () => void;
+type SpeedObserver = (previousSpeed: number) => void;
 
 function callObservers(observersList: any[]): void {
     for (const observer of observersList) {
@@ -31,9 +32,11 @@ function callObservers(observersList: any[]): void {
 const observers: {
     clear: GenericObserver[];
     redraw: GenericObserver[];
+    speedChange: SpeedObserver[];
 } = {
     clear: [],
     redraw: [],
+    speedChange: [],
 };
 
 /* === INTERFACE ====================================================== */
@@ -110,6 +113,9 @@ class Parameters {
     public static get redrawObservers(): GenericObserver[] {
         return observers.redraw;
     }
+    public static get speedChangeObservers(): SpeedObserver[] {
+        return observers.speedChange;
+    }
 
     private constructor() {}
 }
@@ -119,7 +125,12 @@ class Parameters {
 /* --- PARAMETERS ----------------------------------------------------- */
 let speed: number = Range.getValue(controlId.SPEED);
 Range.addObserver(controlId.SPEED, (s: number) => {
+    const previous = speed;
     speed = s;
+    
+    for (const observer of observers.speedChange) {
+        observer(previous);
+    }
 });
 
 let loop: boolean = Checkbox.isChecked(controlId.LOOP);
