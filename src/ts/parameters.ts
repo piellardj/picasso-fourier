@@ -110,16 +110,7 @@ class Parameters {
 let preset: EPreset;
 function tryParsePreset(p: string): void {
     const previousValue = preset;
-
-    if (p === "arlequin") {
-        preset = EPreset.ARLEQUIN;
-    } else if (p === "dog") {
-        preset = EPreset.DOG;
-    } else if (p === "triangle") {
-        preset = EPreset.TRIANGLE;
-    } else if (p === "round") {
-        preset = EPreset.ROUND;
-    }
+    preset = p as EPreset;
 
     if (preset !== previousValue) {
         callObservers(observers.presetChange);

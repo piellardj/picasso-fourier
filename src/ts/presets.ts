@@ -4,9 +4,15 @@ import StopWatch from "./stopwatch";
 
 enum EPreset {
     ARLEQUIN = "arlequin",
+    BULL = "bull",
+    CAMEL = "camel",
     DOG = "dog",
-    ROUND = "round",
-    TRIANGLE = "triangle",
+    DOVE = "dove",
+    FLAMINGO = "flamingo",
+    HORSE = "horse",
+    MOUSE = "mouse",
+    WOMAN1 = "femme1",
+    WOMAN2 = "femme2",
 }
 
 class Presets {

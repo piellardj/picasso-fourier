@@ -36,16 +36,40 @@
                             "checked": true
                         },
                         {
+                            "value": "bull",
+                            "label": "Bull"
+                        },
+                        {
+                            "value": "mouse",
+                            "label": "Mouse"
+                        },
+                        {
+                            "value": "camel",
+                            "label": "Camel"
+                        },
+                        {
+                            "value": "femme1",
+                            "label": "Woman 1"
+                        },
+                        {
+                            "value": "dove",
+                            "label": "Dove"
+                        },
+                        {
+                            "value": "flamingo",
+                            "label": "Flamingo"
+                        },
+                        {
+                            "value": "horse",
+                            "label": "Horse"
+                        },
+                        {
                             "value": "dog",
                             "label": "Dog"
                         },
                         {
-                            "value": "triangle",
-                            "label": "Triangle"
-                        },
-                        {
-                            "value": "round",
-                            "label": "Round"
+                            "value": "femme2",
+                            "label": "Woman 2"
                         }
                     ]
                 },
