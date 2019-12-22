@@ -53,67 +53,29 @@ class Parameters {
     public static get speed(): number {
         return speed;
     }
-    public static set speed(s: number) {
-        speed = s;
-        Range.setValue(controlId.SPEED, s);
-    }
 
     public static get loop(): boolean {
         return loop;
-    }
-    public static set loop(l: boolean) {
-        if (loop !== l) {
-            loop = l;
-            Checkbox.setChecked(controlId.LOOP, l);
-        }
     }
 
     public static get displayCircles(): boolean {
         return displayCircles;
     }
-    public static set displayCircles(display: boolean) {
-        if (displayCircles !== display) {
-            displayCircles = display;
-            Checkbox.setChecked(controlId.DISPLAY_CIRCLES, display);
-        }
-    }
 
     public static get displaySegments(): boolean {
         return displaySegments;
-    }
-    public static set displaySegments(display: boolean) {
-        if (displaySegments !== display) {
-            displaySegments = display;
-            Checkbox.setChecked(controlId.DISPLAY_SEGMENTS, display);
-        }
     }
 
     public static get displayCurve(): boolean {
         return displayCurve;
     }
-    public static set displayCurve(display: boolean) {
-        if (displayCurve !== display) {
-            displayCurve = display;
-            Checkbox.setChecked(controlId.DISPLAY_CURVE, display);
-        }
-    }
 
     public static get displayOriginalCurve(): boolean {
         return displayOriginalCurve;
     }
-    public static set displayOriginalCurve(display: boolean) {
-        if (displayOriginalCurve !== display) {
-            displayOriginalCurve = display;
-            Checkbox.setChecked(controlId.DISPLAY_ORIGINAL_CURVE, display);
-        }
-    }
 
     public static get order(): number {
         return order;
-    }
-    public static set order(o: number) {
-        order = o;
-        Range.setValue(controlId.ORDER, o);
     }
 
     public static get integrationPrecision(): number {
