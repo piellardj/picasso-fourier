@@ -1,5 +1,5 @@
-import IPoint from "./point";
 import Log from "./log";
+import IPoint from "./point";
 import StopWatch from "./stopwatch";
 
 enum EPreset {
@@ -12,7 +12,7 @@ enum EPreset {
 class Presets {
     public static getPreset(preset: EPreset, callback: (array: IPoint[]) => any): void {
         const stopwatch = new StopWatch();
-        
+
         if (typeof Presets.cache === "undefined") {
             Presets.cache = {};
         } else if (typeof Presets.cache[preset] !== "undefined") {

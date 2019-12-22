@@ -107,7 +107,7 @@ class Parameters {
 /* === EVENTS BINDING ================================================= */
 
 /* --- PARAMETERS ----------------------------------------------------- */
-let preset: EPreset
+let preset: EPreset;
 function tryParsePreset(p: string): void {
     const previousValue = preset;
 

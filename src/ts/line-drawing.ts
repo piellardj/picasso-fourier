@@ -80,7 +80,7 @@ class LineDrawing {
 
     public computeFourierSeries(order: number): FourierSeries {
         const stopwatch = new StopWatch();
-        
+
         const nbSteps = Math.ceil(Parameters.integrationPrecision * this.extendedPathLength);
         const stepSize = this.extendedPathLength / nbSteps;
         const dT = 1 / nbSteps;
@@ -147,7 +147,8 @@ class LineDrawing {
             });
         }
 
-        Log.message("Computed " + order + " Fourier coefficient with " + nbSteps + " integration steps in " + stopwatch.milliseconds + " ms.");
+        Log.message("Computed " + order + " Fourier coefficient with " +
+            nbSteps + " integration steps in " + stopwatch.milliseconds + " ms.");
         return new FourierSeries(coefficients, this.pathLength / this.extendedPathLength, this.pathLength);
     }
 }
