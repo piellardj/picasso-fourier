@@ -13,6 +13,7 @@ declare const Tabs: any;
 const controlId = {
     PRESET: "preset-picker-id",
     SPEED: "speed-range-id",
+    PERSISTENCE: "persistence-checkbox-id",
     LOOP: "loop-checkbox-id",
     RESET: "reset-button-id",
     DISPLAY_CIRCLES: "circles-checkbox-id",
@@ -52,6 +53,10 @@ class Parameters {
 
     public static get speed(): number {
         return speed;
+    }
+
+    public static get persistence(): boolean {
+        return persistence;
     }
 
     public static get loop(): boolean {
@@ -127,6 +132,11 @@ Range.addObserver(controlId.SPEED, (s: number) => {
     for (const observer of observers.speedChange) {
         observer(previous);
     }
+});
+
+let persistence: boolean = Checkbox.isChecked(controlId.PERSISTENCE);
+Checkbox.addObserver(controlId.PERSISTENCE, (checked: boolean) => {
+    persistence = checked;
 });
 
 let loop: boolean = Checkbox.isChecked(controlId.LOOP);

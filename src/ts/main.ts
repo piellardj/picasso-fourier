@@ -50,12 +50,15 @@ function main() {
             clock.reset();
             t = 0;
             Canvas.setIndicatorText("fourier-order", Parameters.order.toLocaleString());
+            context.clearRect(0, 0, canvas.width, canvas.height);
         }
 
         if (needToRedraw) {
             adjustCanvasSize();
 
-            context.clearRect(0, 0, canvas.width, canvas.height);
+            if (!Parameters.persistence) {
+                context.clearRect(0, 0, canvas.width, canvas.height);
+            }
 
             if (Parameters.displayOriginalCurve) {
                 context.strokeStyle = "rgb(0,128,0)";
@@ -68,7 +71,7 @@ function main() {
             }
 
             if (Parameters.displayCircles) {
-                context.strokeStyle = "rgba(255,255,255,0.3)";
+                context.strokeStyle = Parameters.persistence ? "rgba(255,255,255,0.01)" : "rgba(255,255,255,0.3)";
                 fourier.drawCircles(context, Parameters.order, t);
             }
 
@@ -78,7 +81,7 @@ function main() {
             }
 
             if (Parameters.displaySegments) {
-                context.strokeStyle = "red";
+                context.strokeStyle = Parameters.persistence ? "rgba(255,0,0,0.01)" : "red";
                 fourier.drawPathToPoint(context, Parameters.order, t);
             }
         }

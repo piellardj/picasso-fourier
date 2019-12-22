@@ -112,19 +112,21 @@ class FourierSeries {
         }
 
         const max = this.computeAmountOfCoefficients(order);
-        if (max <= 0) {
+        if (max < 2) {
             return;
         }
 
         const TWO_PI_T = TWO_PI * this.computeRealT(t);
 
-        let x = this._coefficients[0].magnitude * Math.cos(this._coefficients[0].phase);
-        let y = this._coefficients[0].magnitude * Math.sin(this._coefficients[0].phase);
+        let x = 0;
+        let y = 0;
 
-        for (let i = 1; i < max; i++) {
+        for (let i = 0; i < max; i++) {
             const coefficient = this._coefficients[i];
 
-            drawCircle(x, y, coefficient.magnitude);
+            if (i > 1) {
+                drawCircle(x, y, coefficient.magnitude);
+            }
 
             const TWO_PI_N_T = TWO_PI_T * coefficient.n;
             x += coefficient.magnitude * Math.cos(TWO_PI_N_T + coefficient.phase);
