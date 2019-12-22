@@ -48,6 +48,7 @@ class LineDrawing {
         context.beginPath();
         context.moveTo(this.points[0].x, this.points[0].y);
 
+        t = Math.min(1, Math.max(0, t));
         const desiredLength = t * this.pathLength;
 
         let currentLength = 0;
@@ -141,7 +142,7 @@ class LineDrawing {
             });
         }
 
-        return new FourierSeries(coefficients, this.pathLength / this.extendedPathLength);
+        return new FourierSeries(coefficients, this.pathLength / this.extendedPathLength, this.pathLength);
     }
 }
 

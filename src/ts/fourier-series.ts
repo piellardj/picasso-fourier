@@ -1,3 +1,4 @@
+import { Parameters } from "./parameters";
 import IPoint from "./point";
 
 interface IFourierCoefficient {
@@ -12,9 +13,16 @@ class FourierSeries {
     private readonly _coefficients: IFourierCoefficient[];
     private readonly _length: number;
 
-    public constructor(coefficients: IFourierCoefficient[], length: number) {
+    private _partialCurve: IPoint[];
+    private _partialCurveOrder: number;
+    private _partialCurveStepSize: number;
+
+    public constructor(coefficients: IFourierCoefficient[], length: number, pathLength: number) {
         this._coefficients = coefficients;
         this._length = length;
+
+        this._partialCurve = [];
+        this._partialCurveStepSize = length / (Parameters.curvePrecision * pathLength);
     }
 
     /* Assumes t is between 0 and 1 included. */
@@ -33,6 +41,39 @@ class FourierSeries {
         }
 
         return { x, y };
+    }
+
+    public drawCurve(context: CanvasRenderingContext2D, order: number, t: number): void {
+        t = Math.min(1, Math.max(0, t));
+
+        if (order !== this._partialCurveOrder) {
+            this._partialCurveOrder = order;
+            this._partialCurve = [];
+        }
+
+        // Compute partial curve
+        const currentPointIndex = t / this._partialCurveStepSize;
+        const lastConsolidatedPointIndex = Math.floor(currentPointIndex);
+        const nextConsolidatedPointIndex = Math.ceil(currentPointIndex);
+        let point: IPoint;
+
+        for (let i = this._partialCurve.length; i <= lastConsolidatedPointIndex; i++) {
+            point = this.computePoint(order, i * this._partialCurveStepSize);
+            this._partialCurve.push(point);
+        }
+
+        // Draw partial curve
+        context.beginPath();
+        context.moveTo(this._partialCurve[0].x, this._partialCurve[0].y);
+        for (let i = 1; i < nextConsolidatedPointIndex; i++) {
+            context.lineTo(this._partialCurve[i].x, this._partialCurve[i].y);
+        }
+
+        point = this.computePoint(order, t);
+        context.lineTo(point.x, point.y);
+
+        context.stroke();
+        context.closePath();
     }
 
     public drawPathToPoint(context: CanvasRenderingContext2D, order: number, t: number): void {
@@ -87,6 +128,7 @@ class FourierSeries {
     }
 
     private computeRealT(t: number): number {
+        t = Math.min(1, Math.max(0, t));
         return t * this._length;
     }
 }
