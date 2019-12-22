@@ -14,7 +14,8 @@ const controlId = {
     PRESET: "preset-picker-id",
     SPEED: "speed-range-id",
     PERSISTENCE: "persistence-checkbox-id",
-    LOOP: "loop-checkbox-id",
+    CLOSE_LOOP: "close-loop-checkbox-id",
+    REPEAT: "loop-checkbox-id",
     RESET: "reset-button-id",
     DISPLAY_CIRCLES: "circles-checkbox-id",
     DISPLAY_SEGMENTS: "segments-checkbox-id",
@@ -59,8 +60,12 @@ class Parameters {
         return persistence;
     }
 
-    public static get loop(): boolean {
-        return loop;
+    public static get closeLoop(): boolean {
+        return closeLoop;
+    }
+
+    public static get repeat(): boolean {
+        return repeat;
     }
 
     public static get displayCircles(): boolean {
@@ -139,9 +144,15 @@ Checkbox.addObserver(controlId.PERSISTENCE, (checked: boolean) => {
     persistence = checked;
 });
 
-let loop: boolean = Checkbox.isChecked(controlId.LOOP);
-Checkbox.addObserver(controlId.LOOP, (checked: boolean) => {
-    loop = checked;
+let closeLoop: boolean = Checkbox.isChecked(controlId.CLOSE_LOOP);
+Checkbox.addObserver(controlId.CLOSE_LOOP, (checked: boolean) => {
+    closeLoop = checked;
+    callObservers(observers.clear);
+});
+
+let repeat: boolean = Checkbox.isChecked(controlId.REPEAT);
+Checkbox.addObserver(controlId.REPEAT, (checked: boolean) => {
+    repeat = checked;
 });
 
 Button.addObserver(controlId.RESET, () => callObservers(observers.clear));

@@ -89,7 +89,13 @@
                     "checked": false
                 },
                 {
-                    "title": "Loop",
+                    "title": "Close loop",
+                    "type": "checkbox",
+                    "id": "close-loop-checkbox-id",
+                    "checked": false
+                },
+                {
+                    "title": "Repeat",
                     "type": "checkbox",
                     "id": "loop-checkbox-id",
                     "checked": false

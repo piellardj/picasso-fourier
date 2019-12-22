@@ -140,6 +140,10 @@ class FourierSeries {
 
     private computeRealT(t: number): number {
         t = Math.min(1, Math.max(0, t));
+
+        if (Parameters.closeLoop) {
+            return t;
+        }
         return t * this._length;
     }
 }

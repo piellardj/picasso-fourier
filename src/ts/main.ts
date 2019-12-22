@@ -41,7 +41,7 @@ function main() {
 
         let t = clock.current / wantedLength;
 
-        if (t >= 1 && Parameters.loop) {
+        if (t >= 1 && Parameters.repeat) {
             needToRestart = true;
         }
 

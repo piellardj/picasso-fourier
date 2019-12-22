@@ -52,7 +52,7 @@ class LineDrawing {
         context.moveTo(this.points[0].x, this.points[0].y);
 
         t = Math.min(1, Math.max(0, t));
-        const desiredLength = t * this.pathLength;
+        const desiredLength = Parameters.closeLoop ? t * this.pathLength : t * this.extendedPathLength;
 
         let currentLength = 0;
 
