@@ -44,8 +44,6 @@ const observers: {
     presetChange: [],
 };
 
-Canvas.Observers.canvasResize.push(() => callObservers(observers.clear));
-
 /* === INTERFACE ====================================================== */
 class Parameters {
     public static get preset(): EPreset {

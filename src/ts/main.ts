@@ -82,12 +82,13 @@ function main() {
         requestAnimationFrame(mainLoop);
     }
 
-    function loadPresetAndStartLoop(preset: EPreset): void {
+    function loadPresetAndStartLoop(): void {
         drawing = null;
         fourier = null;
 
+        const canvasSize: number[] = Canvas.getSize();
         Canvas.showLoader(true);
-        Presets.getPreset(preset, (points: IPoint[]) => {
+        Presets.getPreset(Parameters.preset, canvasSize, (points: IPoint[]) => {
             drawing = new LineDrawing(points);
             fourier = drawing.computeFourierSeries(300);
             needToRestart = true;
@@ -98,8 +99,10 @@ function main() {
         });
     }
 
-    Parameters.presetObservers.push(() => loadPresetAndStartLoop(Parameters.preset));
-    loadPresetAndStartLoop(Parameters.preset);
+    Parameters.presetObservers.push(loadPresetAndStartLoop);
+    Canvas.Observers.canvasResize.push(loadPresetAndStartLoop);
+
+    loadPresetAndStartLoop();
 }
 
 main();

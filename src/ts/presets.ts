@@ -16,15 +16,41 @@ enum EPreset {
     WOMAN2 = "woman2",
 }
 
+const PRESET_SIZE = 512; // a preset should be dimensionned for a 512 x 512 canvas
+
 class Presets {
-    public static getPreset(preset: EPreset, callback: (array: IPoint[]) => any): void {
+    public static getPreset(preset: EPreset, wantedSize: number[], callback: (array: IPoint[]) => any): void {
         const stopwatch = new StopWatch();
+        let fromCache = false;
+
+        function safelyCallCallback(points: IPoint[]) {
+            const scaling = Math.min(wantedSize[0] / PRESET_SIZE, wantedSize[1] / PRESET_SIZE);
+            const offsetX = 0.5 * (wantedSize[0] - PRESET_SIZE * scaling);
+            const offsetY = 0.5 * (wantedSize[1] - PRESET_SIZE * scaling);
+
+            /* Create a deep copy to keep the cache clean */
+            const copy: IPoint[] = [];
+            for (const point of points) {
+                copy.push({
+                    x: point.x * scaling + offsetX,
+                    y: point.y * scaling + offsetY,
+                });
+            }
+
+            if (fromCache) {
+                Log.message("Retrieved preset '" + preset + "' from cache in " + stopwatch.milliseconds + " ms.");
+            } else {
+                Log.message("Downloaded preset '" + preset + "' in " + stopwatch.milliseconds + " ms.");
+            }
+
+            callback(copy);
+        }
 
         if (typeof Presets.cache === "undefined") {
             Presets.cache = {};
         } else if (typeof Presets.cache[preset] !== "undefined") {
-            Log.message("Retrieved preset '" + preset + "' from cache in " + stopwatch.milliseconds + " ms.");
-            callback(Presets.cache[preset].slice(0)); // give copy of array for safty
+            fromCache = true;
+            safelyCallCallback(Presets.cache[preset]);
             return;
         }
 
@@ -32,13 +58,11 @@ class Presets {
 
         xhr.addEventListener("readystatechange", () => {
             if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-                Log.message("Downloaded preset '" + preset + "' in " + stopwatch.milliseconds + " ms.");
-
                 const retrievedArray = Presets.tryParsePointsArray(xhr.responseText);
 
                 if (retrievedArray) {
                     Presets.cache[preset] = retrievedArray;
-                    callback(retrievedArray.slice(0)); // give copy of array for safty
+                    safelyCallCallback(Presets.cache[preset]);
                 }
             }
         });
