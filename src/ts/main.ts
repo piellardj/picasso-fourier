@@ -35,62 +35,61 @@ function main() {
 
     const wantedLength = 2000; // milliseconds
     function mainLoop() {
-        if (!drawing || !fourier) { // preset is not loaded yet
-            return; // exit animation frame loop, it will be reentered when preset is loaded
-        }
+        if (drawing && fourier) { // checks that preset is loaded
+            let t = clock.current / wantedLength;
 
-        let t = clock.current / wantedLength;
+            if (t >= 1 && Parameters.repeat) {
+                needToRestart = true;
+            }
 
-        if (t >= 1 && Parameters.repeat) {
-            needToRestart = true;
-        }
-
-        if (needToRestart) {
-            needToRestart = false;
-            clock.reset();
-            t = 0;
-            Canvas.setIndicatorText("fourier-order", Parameters.order.toLocaleString());
-            context.clearRect(0, 0, canvas.width, canvas.height);
-        }
-
-        if (needToRedraw) {
-            adjustCanvasSize();
-
-            if (!Parameters.persistence) {
+            if (needToRestart) {
+                needToRestart = false;
+                clock.reset();
+                t = 0;
+                Canvas.setIndicatorText("fourier-order", Parameters.order.toLocaleString());
                 context.clearRect(0, 0, canvas.width, canvas.height);
             }
 
-            if (Parameters.displayOriginalCurve) {
-                context.strokeStyle = "rgb(0,128,0)";
-                const previousWidth = context.lineWidth;
-                context.lineWidth = 2;
+            if (needToRedraw) {
+                adjustCanvasSize();
 
-                drawing.draw(context, t);
+                if (!Parameters.persistence) {
+                    context.clearRect(0, 0, canvas.width, canvas.height);
+                }
 
-                context.lineWidth = previousWidth;
+                if (Parameters.displayOriginalCurve) {
+                    context.strokeStyle = "rgb(0,128,0)";
+                    const previousWidth = context.lineWidth;
+                    context.lineWidth = 2;
+
+                    drawing.draw(context, t);
+
+                    context.lineWidth = previousWidth;
+                }
+
+                if (Parameters.displayCircles) {
+                    context.strokeStyle = Parameters.persistence ? "rgba(255,255,255,0.01)" : "rgba(255,255,255,0.3)";
+                    fourier.drawCircles(context, Parameters.order, t);
+                }
+
+                if (Parameters.displayCurve) {
+                    context.strokeStyle = "white";
+                    fourier.drawCurve(context, Parameters.order, t);
+                }
+
+                if (Parameters.displaySegments) {
+                    context.strokeStyle = Parameters.persistence ? "rgba(255,0,0,0.01)" : "red";
+                    fourier.drawPathToPoint(context, Parameters.order, t);
+                }
             }
 
-            if (Parameters.displayCircles) {
-                context.strokeStyle = Parameters.persistence ? "rgba(255,255,255,0.01)" : "rgba(255,255,255,0.3)";
-                fourier.drawCircles(context, Parameters.order, t);
-            }
-
-            if (Parameters.displayCurve) {
-                context.strokeStyle = "white";
-                fourier.drawCurve(context, Parameters.order, t);
-            }
-
-            if (Parameters.displaySegments) {
-                context.strokeStyle = Parameters.persistence ? "rgba(255,0,0,0.01)" : "red";
-                fourier.drawPathToPoint(context, Parameters.order, t);
-            }
+            needToRedraw = t < 1;
         }
 
-        needToRedraw = t < 1;
         requestAnimationFrame(mainLoop);
     }
 
-    function loadPresetAndStartLoop(): void {
+    function loadPreset(): void {
         drawing = null;
         fourier = null;
 
@@ -102,15 +101,14 @@ function main() {
             needToRestart = true;
             clock.reset();
             Canvas.showLoader(false);
-
-            requestAnimationFrame(mainLoop);
         });
     }
 
-    Parameters.presetObservers.push(loadPresetAndStartLoop);
-    Canvas.Observers.canvasResize.push(loadPresetAndStartLoop);
+    Parameters.presetObservers.push(loadPreset);
+    Canvas.Observers.canvasResize.push(loadPreset);
 
-    loadPresetAndStartLoop();
+    loadPreset();
+    requestAnimationFrame(mainLoop);
 }
 
 main();
