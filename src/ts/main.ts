@@ -28,14 +28,9 @@ function main() {
     let needToRedraw: boolean = true;
     Parameters.redrawObservers.push(() => needToRedraw = true);
 
-    let needToReload: boolean = false;
-    Parameters.presetObservers.push(() => needToReload = true);
-
     const wantedLength = 2000; // milliseconds
     function mainLoop() {
-        if (needToReload) {
-            needToReload = false;
-            loadPresetAndStartLoop(Parameters.preset);
+        if (!drawing || !fourier) { // preset is not loaded yet
             return; // exit animation frame loop, it will be reentered when preset is loaded
         }
 
@@ -96,6 +91,7 @@ function main() {
         });
     }
 
+    Parameters.presetObservers.push(() => loadPresetAndStartLoop(Parameters.preset));
     loadPresetAndStartLoop(Parameters.preset);
 }
 
