@@ -24,7 +24,7 @@ class Presets {
             Presets.cache = {};
         } else if (typeof Presets.cache[preset] !== "undefined") {
             Log.message("Retrieved preset '" + preset + "' from cache in " + stopwatch.milliseconds + " ms.");
-            callback(Presets.cache[preset]);
+            callback(Presets.cache[preset].slice(0)); // give copy of array for safty
             return;
         }
 
@@ -38,7 +38,7 @@ class Presets {
 
                 if (retrievedArray) {
                     Presets.cache[preset] = retrievedArray;
-                    callback(retrievedArray);
+                    callback(retrievedArray.slice(0)); // give copy of array for safty
                 }
             }
         });
