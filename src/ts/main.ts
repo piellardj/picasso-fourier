@@ -13,8 +13,13 @@ function main() {
     const canvas = document.getElementById("canvas") as HTMLCanvasElement;
     const context = canvas.getContext("2d") as CanvasRenderingContext2D;
 
-    canvas.width = 512;
-    canvas.height = 512;
+    function adjustCanvasSize() {
+        if (canvas.width !== canvas.clientWidth || canvas.height !== canvas.clientHeight) {
+            canvas.width = canvas.clientWidth;
+            canvas.height = canvas.clientHeight;
+        }
+    }
+
     context.lineWidth = 1;
 
     let drawing: LineDrawing;
@@ -48,6 +53,8 @@ function main() {
         }
 
         if (needToRedraw) {
+            adjustCanvasSize();
+
             context.clearRect(0, 0, canvas.width, canvas.height);
 
             if (Parameters.displayCircles) {
