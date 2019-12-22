@@ -77,18 +77,22 @@ class FourierSeries {
     }
 
     public drawPathToPoint(context: CanvasRenderingContext2D, order: number, t: number): void {
-        let x = 0;
-        let y = 0;
+        const max = this.computeAmountOfCoefficients(order);
+        if (max <= 0) {
+            return;
+        }
 
-        t = this.computeRealT(t);
+        let x = this._coefficients[0].magnitude * Math.cos(this._coefficients[0].phase);
+        let y = this._coefficients[0].magnitude * Math.sin(this._coefficients[0].phase);
+
+        const TWO_PI_T = TWO_PI * this.computeRealT(t);
 
         context.beginPath();
         context.moveTo(x, y);
 
-        const max = this.computeAmountOfCoefficients(order);
-        for (let i = 0; i < max; i++) {
+        for (let i = 1; i < max; i++) {
             const coefficient = this._coefficients[i];
-            const TWO_PI_N_T = TWO_PI * coefficient.n * t;
+            const TWO_PI_N_T = TWO_PI_T * coefficient.n;
             x += coefficient.magnitude * Math.cos(TWO_PI_N_T + coefficient.phase);
             y += coefficient.magnitude * Math.sin(TWO_PI_N_T + coefficient.phase);
 
@@ -107,17 +111,22 @@ class FourierSeries {
             context.stroke();
         }
 
-        t = this.computeRealT(t);
-
-        let x = 0;
-        let y = 0;
-
         const max = this.computeAmountOfCoefficients(order);
-        for (let i = 0; i < max; i++) {
+        if (max <= 0) {
+            return;
+        }
+
+        const TWO_PI_T = TWO_PI * this.computeRealT(t);
+
+        let x = this._coefficients[0].magnitude * Math.cos(this._coefficients[0].phase);
+        let y = this._coefficients[0].magnitude * Math.sin(this._coefficients[0].phase);
+
+        for (let i = 1; i < max; i++) {
             const coefficient = this._coefficients[i];
+
             drawCircle(x, y, coefficient.magnitude);
 
-            const TWO_PI_N_T = TWO_PI * coefficient.n * t;
+            const TWO_PI_N_T = TWO_PI_T * coefficient.n;
             x += coefficient.magnitude * Math.cos(TWO_PI_N_T + coefficient.phase);
             y += coefficient.magnitude * Math.sin(TWO_PI_N_T + coefficient.phase);
         }
