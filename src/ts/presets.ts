@@ -2,6 +2,7 @@ import Log from "./log";
 import IPoint from "./point";
 import StopWatch from "./stopwatch";
 
+/* Enum values must match the values of the controls */
 enum EPreset {
     ARLEQUIN = "arlequin",
     BULL = "bull",
@@ -11,8 +12,8 @@ enum EPreset {
     FLAMINGO = "flamingo",
     HORSE = "horse",
     MOUSE = "mouse",
-    WOMAN1 = "femme1",
-    WOMAN2 = "femme2",
+    WOMAN1 = "woman1",
+    WOMAN2 = "woman2",
 }
 
 class Presets {
