@@ -57,6 +57,16 @@ function main() {
 
             context.clearRect(0, 0, canvas.width, canvas.height);
 
+            if (Parameters.displayOriginalCurve) {
+                context.strokeStyle = "rgb(0,128,0)";
+                const previousWidth = context.lineWidth;
+                context.lineWidth = 2;
+
+                drawing.draw(context, t);
+
+                context.lineWidth = previousWidth;
+            }
+
             if (Parameters.displayCircles) {
                 context.strokeStyle = "rgba(255,255,255,0.3)";
                 fourier.drawCircles(context, Parameters.order, t);
@@ -65,11 +75,6 @@ function main() {
             if (Parameters.displayCurve) {
                 context.strokeStyle = "white";
                 fourier.drawCurve(context, Parameters.order, t);
-            }
-
-            if (Parameters.displayOriginalCurve) {
-                context.strokeStyle = "green";
-                drawing.draw(context, t);
             }
 
             if (Parameters.displaySegments) {
