@@ -1,3 +1,5 @@
+import { EPreset } from "./presets";
+
 declare const Button: any;
 declare const Canvas: any;
 declare const Checkbox: any;
@@ -9,6 +11,7 @@ declare const Tabs: any;
 
 /* === IDs ============================================================ */
 const controlId = {
+    PRESET: "preset-picker-id",
     SPEED: "speed-range-id",
     LOOP: "loop-checkbox-id",
     RESET: "reset-button-id",
@@ -33,14 +36,20 @@ const observers: {
     clear: GenericObserver[];
     redraw: GenericObserver[];
     speedChange: SpeedObserver[];
+    presetChange: GenericObserver[];
 } = {
     clear: [],
     redraw: [],
     speedChange: [],
+    presetChange: [],
 };
 
 /* === INTERFACE ====================================================== */
 class Parameters {
+    public static get preset(): EPreset {
+        return preset;
+    }
+
     public static get speed(): number {
         return speed;
     }
@@ -126,6 +135,9 @@ class Parameters {
     public static get speedChangeObservers(): SpeedObserver[] {
         return observers.speedChange;
     }
+    public static get presetObservers(): GenericObserver[] {
+        return observers.presetChange;
+    }
 
     private constructor() {}
 }
@@ -133,6 +145,27 @@ class Parameters {
 /* === EVENTS BINDING ================================================= */
 
 /* --- PARAMETERS ----------------------------------------------------- */
+let preset: EPreset
+function tryParsePreset(p: string): void {
+    const previousValue = preset;
+
+    if (p === "arlequin") {
+        preset = EPreset.ARLEQUIN;
+    } else if (p === "dog") {
+        preset = EPreset.DOG;
+    } else if (p === "triangle") {
+        preset = EPreset.TRIANGLE;
+    } else if (p === "round") {
+        preset = EPreset.ROUND;
+    }
+
+    if (preset !== previousValue) {
+        callObservers(observers.presetChange);
+    }
+}
+Picker.addObserver(controlId.PRESET, tryParsePreset);
+tryParsePreset(Picker.getValue(controlId.PRESET));
+
 let speed: number = Range.getValue(controlId.SPEED);
 Range.addObserver(controlId.SPEED, (s: number) => {
     const previous = speed;

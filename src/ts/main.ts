@@ -28,8 +28,17 @@ function main() {
     let needToRedraw: boolean = true;
     Parameters.redrawObservers.push(() => needToRedraw = true);
 
+    let needToReload: boolean = false;
+    Parameters.presetObservers.push(() => needToReload = true);
+
     const wantedLength = 2000; // milliseconds
     function mainLoop() {
+        if (needToReload) {
+            needToReload = false;
+            loadPresetAndStartLoop(Parameters.preset);
+            return; // exit animation frame loop, it will be reentered when preset is loaded
+        }
+
         let t = clock.current / wantedLength;
 
         if (t >= 1 && Parameters.loop) {
@@ -71,13 +80,23 @@ function main() {
         requestAnimationFrame(mainLoop);
     }
 
-    Presets.getPreset(EPreset.ARLEQUIN, (points: IPoint[]) => {
-        drawing = new LineDrawing(points);
-        fourier = drawing.computeFourierSeries(300);
-        clock.reset();
+    function loadPresetAndStartLoop(preset: EPreset): void {
+        drawing = null;
+        fourier = null;
 
-        requestAnimationFrame(mainLoop);
-    });
+        Canvas.showLoader(true);
+        Presets.getPreset(preset, (points: IPoint[]) => {
+            drawing = new LineDrawing(points);
+            fourier = drawing.computeFourierSeries(300);
+            needToRestart = true;
+            clock.reset();
+            Canvas.showLoader(false);
+
+            requestAnimationFrame(mainLoop);
+        });
+    }
+
+    loadPresetAndStartLoop(Parameters.preset);
 }
 
 main();

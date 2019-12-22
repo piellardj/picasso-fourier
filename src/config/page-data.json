@@ -25,6 +25,31 @@
             "title": "Animation",
             "controls": [
                 {
+                    "title": "Drawing",
+                    "type": "picker",
+                    "id": "preset-picker-id",
+                    "placeholder": "Custom",
+                    "options": [
+                        {
+                            "value": "arlequin",
+                            "label": "Arlequin",
+                            "checked": true
+                        },
+                        {
+                            "value": "dog",
+                            "label": "Dog"
+                        },
+                        {
+                            "value": "triangle",
+                            "label": "Triangle"
+                        },
+                        {
+                            "value": "round",
+                            "label": "Round"
+                        }
+                    ]
+                },
+                {
                     "title": "Speed",
                     "type": "range",
                     "id": "speed-range-id",
