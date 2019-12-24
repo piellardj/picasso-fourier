@@ -25,24 +25,6 @@ class FourierSeries {
         this._partialCurveStepSize = length / (Parameters.curvePrecision * pathLength);
     }
 
-    /* Assumes t is between 0 and 1 included. */
-    public computePoint(order: number, t: number): IPoint {
-        let x = 0;
-        let y = 0;
-
-        t = this.computeRealT(t);
-
-        const max = this.computeAmountOfCoefficients(order);
-        for (let i = 0; i < max; i++) {
-            const coefficient = this._coefficients[i];
-            const TWO_PI_N_T = TWO_PI * coefficient.n * t;
-            x += coefficient.magnitude * Math.cos(TWO_PI_N_T + coefficient.phase);
-            y += coefficient.magnitude * Math.sin(TWO_PI_N_T + coefficient.phase);
-        }
-
-        return { x, y };
-    }
-
     public drawCurve(context: CanvasRenderingContext2D, order: number, t: number): void {
         t = Math.min(1, Math.max(0, t));
 
@@ -132,6 +114,24 @@ class FourierSeries {
             x += coefficient.magnitude * Math.cos(TWO_PI_N_T + coefficient.phase);
             y += coefficient.magnitude * Math.sin(TWO_PI_N_T + coefficient.phase);
         }
+    }
+
+    /* Assumes t is between 0 and 1 included. */
+    private computePoint(order: number, t: number): IPoint {
+        let x = 0;
+        let y = 0;
+
+        t = this.computeRealT(t);
+
+        const max = this.computeAmountOfCoefficients(order);
+        for (let i = 0; i < max; i++) {
+            const coefficient = this._coefficients[i];
+            const TWO_PI_N_T = TWO_PI * coefficient.n * t;
+            x += coefficient.magnitude * Math.cos(TWO_PI_N_T + coefficient.phase);
+            y += coefficient.magnitude * Math.sin(TWO_PI_N_T + coefficient.phase);
+        }
+
+        return { x, y };
     }
 
     private computeAmountOfCoefficients(order: number): number {
