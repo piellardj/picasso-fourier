@@ -45,6 +45,7 @@ function main() {
             if (needToRestart) {
                 needToRestart = false;
                 clock.reset();
+                fourier.resetCurve();
                 t = 0;
                 Canvas.setIndicatorText("fourier-order", Parameters.order.toLocaleString());
                 context.clearRect(0, 0, canvas.width, canvas.height);

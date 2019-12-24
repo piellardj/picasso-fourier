@@ -25,12 +25,16 @@ class FourierSeries {
         this._partialCurveStepSize = length / (Parameters.curvePrecision * pathLength);
     }
 
+    public resetCurve(): void {
+        this._partialCurve = [];
+    }
+
     public drawCurve(context: CanvasRenderingContext2D, order: number, t: number): void {
         t = Math.min(1, Math.max(0, t));
 
         if (order !== this._partialCurveOrder) {
             this._partialCurveOrder = order;
-            this._partialCurve = [];
+            this.resetCurve();
         }
 
         // Compute partial curve
