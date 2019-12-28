@@ -7,6 +7,8 @@ import { Parameters } from "./parameters";
 
 import { EPreset, Presets } from "./presets";
 
+import { TimeUnit } from "./units";
+
 declare const Canvas: any;
 
 function main() {
@@ -36,9 +38,12 @@ function main() {
     const wantedLength = 2000; // milliseconds
     function mainLoop() {
         if (drawing && fourier) { // checks that preset is loaded
-            let t = clock.current / wantedLength;
+            let t: TimeUnit = clock.current / wantedLength;
+            const maxT: TimeUnit = Parameters.closeLoop ? 1 : drawing.originalPathLength;
 
-            if (t >= 1 && Parameters.repeat) {
+            t = Math.min(t, maxT);
+
+            if (t >= maxT && Parameters.repeat) {
                 needToRestart = true;
             }
 
@@ -84,7 +89,7 @@ function main() {
                 }
             }
 
-            needToRedraw = t < 1;
+            needToRedraw = t < maxT;
         }
 
         requestAnimationFrame(mainLoop);

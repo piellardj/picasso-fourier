@@ -1,46 +1,62 @@
 import { FourierSeries, IFourierCoefficient } from "./fourier-series";
 import { Parameters } from "./parameters";
-import { distance, interpolate, IPoint } from "./point";
+import { distance, equals, interpolate, IPoint } from "./point";
+import { SpaceUnit, TimeUnit } from "./units";
 
 import Log from "./log";
 import StopWatch from "./stopwatch";
 
+/**
+ * Represents a 2D line parametrized by a 1D input.
+ * The line is 1-periodic: [0,1] -> RxR.
+ * The 1D input is called Time (or t).
+ * The 2D output is called Space.
+ */
 class LineDrawing {
-    public readonly pathLength: number; // length of the input path
+    public readonly pathLength: SpaceUnit; // length of the total path in space-units
+    public readonly originalPathLength: TimeUnit; // length of the original path in time-units
     private readonly points: IPoint[];
-    private readonly extendedPathLength: number; // length of the actual path, potentially extended to make it periodic
 
+    /**
+     * Builds a LineDrawing from the input points.
+     * If the input is not periodic, then we extend it with a last point to make the LineDrawing periodic.
+     */
     public constructor(points: IPoint[]) {
         this.points = points;
 
-        this.pathLength = 0;
+        let originalPathLength: SpaceUnit = 0;
         for (let i = 0; i < this.points.length - 1; i++) {
-            this.pathLength += distance(this.points[i], this.points[i + 1]);
+            originalPathLength += distance(this.points[i], this.points[i + 1]);
         }
 
-        this.extendedPathLength = this.pathLength;
+        let totalPathLength: SpaceUnit = originalPathLength;
 
         // For Fourier series computing, artificially make the path periodic
         const firstPoint = this.points[0];
         const lastPoint = this.points[this.points.length - 1];
-        if (firstPoint.x !== lastPoint.x || firstPoint.y !== lastPoint.y) {
-            this.extendedPathLength += distance(lastPoint, firstPoint);
+        if (!equals(firstPoint, lastPoint)) {
+            totalPathLength += distance(lastPoint, firstPoint);
             this.points.push({
                 x: firstPoint.x,
                 y: firstPoint.y,
             });
         }
+
+        this.pathLength = totalPathLength;
+        this.originalPathLength = originalPathLength / totalPathLength;
     }
 
-    /* Assumes t is between 0 and 1 included. */
-    public draw(context: CanvasRenderingContext2D, t: number) {
+    /**
+     * Draws the line portion between 0 and t.
+     * @param t Expected to be in [0, 1]
+     */
+    public draw(context: CanvasRenderingContext2D, t: TimeUnit): void {
         context.beginPath();
         context.moveTo(this.points[0].x, this.points[0].y);
 
-        t = Math.min(1, Math.max(0, t));
-        const desiredLength = Parameters.closeLoop ? t * this.extendedPathLength : t * this.pathLength;
+        const desiredLength: SpaceUnit = t * this.pathLength;
 
-        let currentLength = 0;
+        let currentLength: SpaceUnit = 0;
 
         let i: number;
         for (i = 0; i < this.points.length - 1; i++) {
@@ -67,8 +83,8 @@ class LineDrawing {
     public computeFourierSeries(order: number): FourierSeries {
         const stopwatch = new StopWatch();
 
-        const nbSteps = Math.ceil(Parameters.integrationPrecision * this.extendedPathLength);
-        const stepSize = this.extendedPathLength / nbSteps;
+        const nbSteps = Math.ceil(Parameters.integrationPrecision * this.pathLength);
+        const stepSize = this.pathLength / nbSteps;
         const dT = 1 / nbSteps;
 
         /* Precompute function samples to avoid computing them for each coefficient. */
@@ -135,7 +151,7 @@ class LineDrawing {
 
         Log.message("Computed " + order + " Fourier coefficient with " +
             nbSteps + " integration steps in " + stopwatch.milliseconds + " ms.");
-        return new FourierSeries(coefficients, this.pathLength / this.extendedPathLength, this.pathLength);
+        return new FourierSeries(coefficients, this.pathLength);
     }
 }
 

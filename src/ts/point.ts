@@ -17,8 +17,13 @@ function distance(p1: IPoint, p2: IPoint): number {
     return Math.sqrt(dX * dX + dY * dY);
 }
 
+function equals(p1: IPoint, p2: IPoint): boolean {
+    return p1.x === p2.x && p1.y === p2.y;
+}
+
 export {
     distance,
+    equals,
     interpolate,
     IPoint,
 };

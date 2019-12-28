@@ -1,5 +1,6 @@
 import { Parameters } from "./parameters";
 import { IPoint } from "./point";
+import { SpaceUnit, TimeUnit } from "./units";
 
 interface IFourierCoefficient {
     magnitude: number;
@@ -9,42 +10,43 @@ interface IFourierCoefficient {
 
 const TWO_PI = 2 * Math.PI;
 
+/**
+ * Represents the Fourier development of a 1-periodic [0,1] -> RxR signal.
+ * The 1D input is called Time (or t).
+ * The 2D output is called Space.
+ */
 class FourierSeries {
     private readonly _coefficients: IFourierCoefficient[];
-    private readonly _length: number;
 
+    private readonly _curveStepSize: SpaceUnit;
     private _partialCurve: IPoint[];
     private _partialCurveOrder: number;
-    private _partialCurveStepSize: number;
 
-    public constructor(coefficients: IFourierCoefficient[], length: number, pathLength: number) {
+    public constructor(coefficients: IFourierCoefficient[], totalLength: SpaceUnit) {
         this._coefficients = coefficients;
-        this._length = length;
 
         this._partialCurve = [];
-        this._partialCurveStepSize = length / (Parameters.curvePrecision * pathLength);
+        this._curveStepSize = 1 / (Parameters.curvePrecision * totalLength);
     }
 
     public resetCurve(): void {
         this._partialCurve = [];
     }
 
-    public drawCurve(context: CanvasRenderingContext2D, order: number, t: number): void {
-        t = Math.min(1, Math.max(0, t));
-
+    public drawCurve(context: CanvasRenderingContext2D, order: number, t: TimeUnit): void {
         if (order !== this._partialCurveOrder) {
             this._partialCurveOrder = order;
             this.resetCurve();
         }
 
         // Compute partial curve
-        const currentPointIndex = t / this._partialCurveStepSize;
+        const currentPointIndex = t / this._curveStepSize;
         const lastConsolidatedPointIndex = Math.floor(currentPointIndex);
         const nextConsolidatedPointIndex = Math.ceil(currentPointIndex);
         let point: IPoint;
 
         for (let i = this._partialCurve.length; i <= lastConsolidatedPointIndex; i++) {
-            point = this.computePoint(order, i * this._partialCurveStepSize);
+            point = this.computePoint(order, i * this._curveStepSize);
             this._partialCurve.push(point);
         }
 
@@ -62,7 +64,7 @@ class FourierSeries {
         context.closePath();
     }
 
-    public drawPathToPoint(context: CanvasRenderingContext2D, order: number, t: number): void {
+    public drawPathToPoint(context: CanvasRenderingContext2D, order: number, t: TimeUnit): void {
         const max = this.computeAmountOfCoefficients(order);
         if (max <= 0) {
             return;
@@ -71,7 +73,7 @@ class FourierSeries {
         let x = this._coefficients[0].magnitude * Math.cos(this._coefficients[0].phase);
         let y = this._coefficients[0].magnitude * Math.sin(this._coefficients[0].phase);
 
-        const TWO_PI_T = TWO_PI * this.computeRealT(t);
+        const TWO_PI_T = TWO_PI * t;
 
         context.beginPath();
         context.moveTo(x, y);
@@ -89,7 +91,7 @@ class FourierSeries {
         context.closePath();
     }
 
-    public drawCircles(context: CanvasRenderingContext2D, order: number, t: number): void {
+    public drawCircles(context: CanvasRenderingContext2D, order: number, t: TimeUnit): void {
         function drawCircle(centerX: number, centerY: number, radius: number) {
             context.beginPath();
             context.arc(centerX, centerY, radius, 0, TWO_PI);
@@ -102,7 +104,7 @@ class FourierSeries {
             return;
         }
 
-        const TWO_PI_T = TWO_PI * this.computeRealT(t);
+        const TWO_PI_T = TWO_PI * t;
 
         let x = 0;
         let y = 0;
@@ -125,8 +127,6 @@ class FourierSeries {
         let x = 0;
         let y = 0;
 
-        t = this.computeRealT(t);
-
         const max = this.computeAmountOfCoefficients(order);
         for (let i = 0; i < max; i++) {
             const coefficient = this._coefficients[i];
@@ -140,15 +140,6 @@ class FourierSeries {
 
     private computeAmountOfCoefficients(order: number): number {
         return Math.min(this._coefficients.length, 1 + 2 * order);
-    }
-
-    private computeRealT(t: number): number {
-        t = Math.min(1, Math.max(0, t));
-
-        if (Parameters.closeLoop) {
-            return t;
-        }
-        return t * this._length;
     }
 }
 
