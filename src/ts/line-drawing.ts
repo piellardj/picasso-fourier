@@ -13,7 +13,7 @@ import { SpaceUnit, TimeUnit } from "./units";
  */
 class LineDrawing {
     public readonly pathLength: SpaceUnit; // Length of the total path in space-units
-    public readonly originalPathLength: TimeUnit; // Length of the original path in time-units
+    public readonly originalPathDuration: TimeUnit; // Length of the original path in time-units
     private readonly points: IPoint[];
 
     /**
@@ -42,7 +42,7 @@ class LineDrawing {
         }
 
         this.pathLength = totalPathLength;
-        this.originalPathLength = originalPathLength / totalPathLength;
+        this.originalPathDuration = originalPathLength / totalPathLength;
     }
 
     /**

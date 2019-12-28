@@ -79,7 +79,6 @@ Checkbox.addObserver(controlId.PERSISTENCE, (checked: boolean) => {
 let closeLoop: boolean = Checkbox.isChecked(controlId.CLOSE_LOOP);
 Checkbox.addObserver(controlId.CLOSE_LOOP, (checked: boolean) => {
     closeLoop = checked;
-    callObservers(observers.clear);
 });
 
 let repeat: boolean = Checkbox.isChecked(controlId.REPEAT);

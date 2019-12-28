@@ -19,6 +19,10 @@ function main(): void {
         }
     }
 
+    function clearCanvas(): void {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
     context.lineWidth = 1;
 
     let drawing: LineDrawing = null;
@@ -32,16 +36,25 @@ function main(): void {
     let needToRedraw = true;
     Parameters.redrawObservers.push(() => needToRedraw = true);
 
-    const wantedLength = 2000; // milliseconds
+    const loopDuration = 2000; // milliseconds, at normal speed
     function mainLoop(): void {
         if (drawing !== null && fourier !== null) { // checks that preset is loaded
-            let t: TimeUnit = clock.current / wantedLength;
-            const maxT: TimeUnit = Parameters.closeLoop ? 1 : drawing.originalPathLength;
+            let t: TimeUnit = clock.current / loopDuration;
+            const maxT: TimeUnit = Parameters.closeLoop ? 1 : drawing.originalPathDuration;
+            let finishedLoop = (t >= maxT);
+
+            if (!finishedLoop && clock.isPaused) {
+                clock.resume();
+            }
 
             t = Math.min(t, maxT);
 
-            if (t >= maxT && Parameters.repeat) {
-                needToRestart = true;
+            if (finishedLoop) {
+                if (Parameters.repeat) {
+                    needToRestart = true;
+                } else {
+                    clock.pause();
+                }
             }
 
             if (needToRestart) {
@@ -49,15 +62,16 @@ function main(): void {
                 clock.reset();
                 fourier.resetCurve();
                 t = 0;
+                finishedLoop = false;
                 Canvas.setIndicatorText("fourier-order", Parameters.order.toLocaleString());
-                context.clearRect(0, 0, canvas.width, canvas.height);
+                clearCanvas();
             }
 
             if (needToRedraw) {
                 adjustCanvasSize();
 
                 if (!Parameters.persistence) {
-                    context.clearRect(0, 0, canvas.width, canvas.height);
+                    clearCanvas();
                 }
 
                 if (Parameters.displayOriginalCurve) {
@@ -86,7 +100,7 @@ function main(): void {
                 }
             }
 
-            needToRedraw = t < maxT;
+            needToRedraw = !finishedLoop;
         }
 
         requestAnimationFrame(mainLoop);
