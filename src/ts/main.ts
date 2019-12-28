@@ -1,3 +1,4 @@
+import { Canvas2D } from "./canvas-2d";
 import { Clock } from "./clock";
 import { FourierSeries } from "./fourier-series";
 import { LineDrawing } from "./line-drawing";
@@ -9,20 +10,8 @@ import { TimeUnit } from "./units";
 declare const Canvas: any;
 
 function main(): void {
-    const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-    const context: CanvasRenderingContext2D = canvas.getContext("2d");
-
-    function adjustCanvasSize(): void {
-        if (canvas.width !== canvas.clientWidth || canvas.height !== canvas.clientHeight) {
-            canvas.width = canvas.clientWidth;
-            canvas.height = canvas.clientHeight;
-        }
-    }
-
-    function clearCanvas(): void {
-        context.clearRect(0, 0, canvas.width, canvas.height);
-    }
-
+    const canvas2D = new Canvas2D("canvas");
+    const context = canvas2D.context;
     context.lineWidth = 1;
 
     let drawing: LineDrawing = null;
@@ -64,14 +53,14 @@ function main(): void {
                 t = 0;
                 finishedLoop = false;
                 Canvas.setIndicatorText("fourier-order", Parameters.order.toLocaleString());
-                clearCanvas();
+                canvas2D.clear();
             }
 
             if (needToRedraw) {
-                adjustCanvasSize();
+                canvas2D.adjustSize();
 
                 if (!Parameters.persistence) {
-                    clearCanvas();
+                    canvas2D.clear();
                 }
 
                 if (Parameters.displayOriginalCurve) {
