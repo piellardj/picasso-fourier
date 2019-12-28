@@ -1,15 +1,16 @@
 let enabled = true;
 
-class Log {
-    public static set enabled(e: boolean) {
-        enabled = e;
-    }
+function setEnabled(e: boolean): void {
+    enabled = e;
+}
 
-    public static message(m: string): void {
-        if (enabled) {
-            console.log(m);
-        }
+function message(m: string): void {
+    if (enabled) {
+        console.log(m);
     }
 }
 
-export default Log;
+export {
+    setEnabled,
+    message,
+};

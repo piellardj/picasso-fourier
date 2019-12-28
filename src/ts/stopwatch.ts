@@ -1,3 +1,6 @@
+/**
+ * Class for measuring execution performance.
+ */
 class StopWatch {
     private readonly start: DOMHighResTimeStamp;
 
@@ -10,4 +13,6 @@ class StopWatch {
     }
 }
 
-export default StopWatch;
+export {
+    StopWatch,
+};

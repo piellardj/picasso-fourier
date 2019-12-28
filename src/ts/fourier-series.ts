@@ -16,45 +16,45 @@ const TWO_PI = 2 * Math.PI;
  * The 2D output is called Space.
  */
 class FourierSeries {
-    private readonly _coefficients: IFourierCoefficient[];
+    private readonly coefficients: IFourierCoefficient[];
 
-    private readonly _curveStepSize: SpaceUnit;
-    private _partialCurve: IPoint[];
-    private _partialCurveOrder: number;
+    private readonly curveStepSize: SpaceUnit;
+    private partialCurve: IPoint[];
+    private partialCurveOrder: number;
 
     public constructor(coefficients: IFourierCoefficient[], totalLength: SpaceUnit) {
-        this._coefficients = coefficients;
+        this.coefficients = coefficients;
 
-        this._partialCurve = [];
-        this._curveStepSize = 1 / (Parameters.curvePrecision * totalLength);
+        this.partialCurve = [];
+        this.curveStepSize = 1 / (Parameters.curvePrecision * totalLength);
     }
 
     public resetCurve(): void {
-        this._partialCurve = [];
+        this.partialCurve = [];
     }
 
     public drawCurve(context: CanvasRenderingContext2D, order: number, t: TimeUnit): void {
-        if (order !== this._partialCurveOrder) {
-            this._partialCurveOrder = order;
+        if (order !== this.partialCurveOrder) {
+            this.partialCurveOrder = order;
             this.resetCurve();
         }
 
         // Compute partial curve
-        const currentPointIndex = t / this._curveStepSize;
+        const currentPointIndex = t / this.curveStepSize;
         const lastConsolidatedPointIndex = Math.floor(currentPointIndex);
         const nextConsolidatedPointIndex = Math.ceil(currentPointIndex);
         let point: IPoint;
 
-        for (let i = this._partialCurve.length; i <= lastConsolidatedPointIndex; i++) {
-            point = this.computePoint(order, i * this._curveStepSize);
-            this._partialCurve.push(point);
+        for (let i = this.partialCurve.length; i <= lastConsolidatedPointIndex; i++) {
+            point = this.computePoint(order, i * this.curveStepSize);
+            this.partialCurve.push(point);
         }
 
         // Draw partial curve
         context.beginPath();
-        context.moveTo(this._partialCurve[0].x, this._partialCurve[0].y);
+        context.moveTo(this.partialCurve[0].x, this.partialCurve[0].y);
         for (let i = 1; i < nextConsolidatedPointIndex; i++) {
-            context.lineTo(this._partialCurve[i].x, this._partialCurve[i].y);
+            context.lineTo(this.partialCurve[i].x, this.partialCurve[i].y);
         }
 
         point = this.computePoint(order, t);
@@ -64,14 +64,19 @@ class FourierSeries {
         context.closePath();
     }
 
+    /**
+     * Draws the [0, t] portion of the approximated curve.
+     * @param order Maximum Fourier order to use. Coefficients -order, -order+1, ..., 0, ..., +order will be used.
+     * @param t Expected to be in [0, 1]
+     */
     public drawPathToPoint(context: CanvasRenderingContext2D, order: number, t: TimeUnit): void {
         const max = this.computeAmountOfCoefficients(order);
         if (max <= 0) {
             return;
         }
 
-        let x = this._coefficients[0].magnitude * Math.cos(this._coefficients[0].phase);
-        let y = this._coefficients[0].magnitude * Math.sin(this._coefficients[0].phase);
+        let x = this.coefficients[0].magnitude * Math.cos(this.coefficients[0].phase);
+        let y = this.coefficients[0].magnitude * Math.sin(this.coefficients[0].phase);
 
         const TWO_PI_T = TWO_PI * t;
 
@@ -79,7 +84,7 @@ class FourierSeries {
         context.moveTo(x, y);
 
         for (let i = 1; i < max; i++) {
-            const coefficient = this._coefficients[i];
+            const coefficient = this.coefficients[i];
             const TWO_PI_N_T = TWO_PI_T * coefficient.n;
             x += coefficient.magnitude * Math.cos(TWO_PI_N_T + coefficient.phase);
             y += coefficient.magnitude * Math.sin(TWO_PI_N_T + coefficient.phase);
@@ -91,8 +96,13 @@ class FourierSeries {
         context.closePath();
     }
 
+    /**
+     * Draws the circles representing the Fourier coefficients used to compute the point position at t.
+     * @param order Maximum Fourier order to use. Coefficients -order, -order+1, ..., 0, ..., +order will be used.
+     * @param t Expected to be in [0, 1]
+     */
     public drawCircles(context: CanvasRenderingContext2D, order: number, t: TimeUnit): void {
-        function drawCircle(centerX: number, centerY: number, radius: number) {
+        function drawCircle(centerX: number, centerY: number, radius: number): void {
             context.beginPath();
             context.arc(centerX, centerY, radius, 0, TWO_PI);
             context.closePath();
@@ -110,7 +120,7 @@ class FourierSeries {
         let y = 0;
 
         for (let i = 0; i < max; i++) {
-            const coefficient = this._coefficients[i];
+            const coefficient = this.coefficients[i];
 
             if (i > 1) {
                 drawCircle(x, y, coefficient.magnitude);
@@ -129,7 +139,7 @@ class FourierSeries {
 
         const max = this.computeAmountOfCoefficients(order);
         for (let i = 0; i < max; i++) {
-            const coefficient = this._coefficients[i];
+            const coefficient = this.coefficients[i];
             const TWO_PI_N_T = TWO_PI * coefficient.n * t;
             x += coefficient.magnitude * Math.cos(TWO_PI_N_T + coefficient.phase);
             y += coefficient.magnitude * Math.sin(TWO_PI_N_T + coefficient.phase);
@@ -139,7 +149,7 @@ class FourierSeries {
     }
 
     private computeAmountOfCoefficients(order: number): number {
-        return Math.min(this._coefficients.length, 1 + 2 * order);
+        return Math.min(this.coefficients.length, 1 + 2 * order);
     }
 }
 

@@ -1,6 +1,6 @@
-import Log from "./log";
+import * as Log from "./log";
 import { IPoint } from "./point";
-import StopWatch from "./stopwatch";
+import { StopWatch } from "./stopwatch";
 
 /* Enum values must match the values of the controls */
 enum EPreset {
@@ -18,12 +18,16 @@ enum EPreset {
 
 const PRESET_SIZE = 512; // a preset should be dimensionned for a 512 x 512 canvas
 
+/**
+ * Class for retrieving on demand the preset drawings with AJAX requests.
+ * Tries to minimize the request by using a memory cache.
+ */
 class Presets {
     public static getPreset(preset: EPreset, wantedSize: number[], callback: (array: IPoint[]) => any): void {
         const stopwatch = new StopWatch();
         let fromCache = false;
 
-        function safelyCallCallback(points: IPoint[]) {
+        function safelyCallCallback(points: IPoint[]): void {
             const scaling = Math.min(wantedSize[0] / PRESET_SIZE, wantedSize[1] / PRESET_SIZE);
             const offsetX = 0.5 * (wantedSize[0] - PRESET_SIZE * scaling);
             const offsetY = 0.5 * (wantedSize[1] - PRESET_SIZE * scaling);
@@ -38,9 +42,9 @@ class Presets {
             }
 
             if (fromCache) {
-                Log.message("Retrieved preset '" + preset + "' from cache in " + stopwatch.milliseconds + " ms.");
+                Log.message(`Retrieved preset '${preset}' from cache in ${stopwatch.milliseconds} ms`);
             } else {
-                Log.message("Downloaded preset '" + preset + "' in " + stopwatch.milliseconds + " ms.");
+                Log.message(`Downloaded preset '${preset}' in ${stopwatch.milliseconds} ms.`);
             }
 
             callback(copy);
@@ -60,15 +64,15 @@ class Presets {
             if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
                 const retrievedArray = Presets.tryParsePointsArray(xhr.responseText);
 
-                if (retrievedArray) {
+                if (retrievedArray !== null) {
                     Presets.cache[preset] = retrievedArray;
                     safelyCallCallback(Presets.cache[preset]);
                 }
             }
         });
 
-        xhr.open("GET", "resources/" + preset + ".txt");
-        xhr.send(null);
+        xhr.open("GET", `resources/${preset}.txt`);
+        xhr.send();
     }
 
     private static cache: {
@@ -101,7 +105,7 @@ class Presets {
             return null;
         }
 
-        Log.message("Parsed preset in " + stopwatch.milliseconds + " ms.");
+        Log.message(`Parsed preset in ${stopwatch.milliseconds} ms.`);
         return points;
     }
 }

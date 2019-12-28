@@ -1,21 +1,18 @@
+import { Clock } from "./clock";
 import { FourierSeries } from "./fourier-series";
-import LineDrawing from "./line-drawing";
-import { IPoint } from "./point";
-
-import Clock from "./clock";
+import { LineDrawing } from "./line-drawing";
 import { Parameters } from "./parameters";
-
-import { EPreset, Presets } from "./presets";
-
+import { IPoint } from "./point";
+import { Presets } from "./presets";
 import { TimeUnit } from "./units";
 
 declare const Canvas: any;
 
-function main() {
+function main(): void {
     const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-    const context = canvas.getContext("2d") as CanvasRenderingContext2D;
+    const context: CanvasRenderingContext2D = canvas.getContext("2d");
 
-    function adjustCanvasSize() {
+    function adjustCanvasSize(): void {
         if (canvas.width !== canvas.clientWidth || canvas.height !== canvas.clientHeight) {
             canvas.width = canvas.clientWidth;
             canvas.height = canvas.clientHeight;
@@ -24,20 +21,20 @@ function main() {
 
     context.lineWidth = 1;
 
-    let drawing: LineDrawing;
-    let fourier: FourierSeries;
+    let drawing: LineDrawing = null;
+    let fourier: FourierSeries = null;
 
     const clock = new Clock();
 
-    let needToRestart: boolean = true;
+    let needToRestart = true;
     Parameters.clearObservers.push(() => needToRestart = true);
 
-    let needToRedraw: boolean = true;
+    let needToRedraw = true;
     Parameters.redrawObservers.push(() => needToRedraw = true);
 
     const wantedLength = 2000; // milliseconds
-    function mainLoop() {
-        if (drawing && fourier) { // checks that preset is loaded
+    function mainLoop(): void {
+        if (drawing !== null && fourier !== null) { // checks that preset is loaded
             let t: TimeUnit = clock.current / wantedLength;
             const maxT: TimeUnit = Parameters.closeLoop ? 1 : drawing.originalPathLength;
 

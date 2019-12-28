@@ -1,5 +1,8 @@
 import { Parameters } from "./parameters";
 
+/**
+ * This class handles the measuring of time at a variable speed.
+ */
 class Clock {
     private speed: number;
     private lastCheckpoint: DOMHighResTimeStamp;
@@ -28,4 +31,6 @@ class Clock {
     }
 }
 
-export default Clock;
+export {
+    Clock,
+};

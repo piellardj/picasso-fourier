@@ -1,13 +1,13 @@
 import { EPreset } from "./presets";
 
 declare const Button: any;
-declare const Canvas: any;
+// declare const Canvas: any;
 declare const Checkbox: any;
-declare const Controls: any;
-declare const FileControl: any;
+// declare const Controls: any;
+// declare const FileControl: any;
 declare const Picker: any;
 declare const Range: any;
-declare const Tabs: any;
+// declare const Tabs: any;
 
 /* === IDs ============================================================ */
 const controlId = {
@@ -28,7 +28,7 @@ const controlId = {
 type GenericObserver = () => void;
 type SpeedObserver = (previousSpeed: number) => void;
 
-function callObservers(observersList: any[]): void {
+function callObservers(observersList: GenericObserver[]): void {
     for (const observer of observersList) {
         observer();
     }
@@ -45,74 +45,6 @@ const observers: {
     speedChange: [],
     presetChange: [],
 };
-
-/* === INTERFACE ====================================================== */
-class Parameters {
-    public static get preset(): EPreset {
-        return preset;
-    }
-
-    public static get speed(): number {
-        return speed;
-    }
-
-    public static get persistence(): boolean {
-        return persistence;
-    }
-
-    public static get closeLoop(): boolean {
-        return closeLoop;
-    }
-
-    public static get repeat(): boolean {
-        return repeat;
-    }
-
-    public static get displayCircles(): boolean {
-        return displayCircles;
-    }
-
-    public static get displaySegments(): boolean {
-        return displaySegments;
-    }
-
-    public static get displayCurve(): boolean {
-        return displayCurve;
-    }
-
-    public static get displayOriginalCurve(): boolean {
-        return displayOriginalCurve;
-    }
-
-    public static get order(): number {
-        return order;
-    }
-
-    public static get integrationPrecision(): number {
-        const integrationStepSize = 1; // one space-unit per integration step
-        return 1 / integrationStepSize;
-    }
-
-    public static get curvePrecision(): number {
-        const stepSize = 2; // sampling every two space-units
-        return 1 / stepSize;
-    }
-
-    public static get clearObservers(): GenericObserver[] {
-        return observers.clear;
-    }
-    public static get redrawObservers(): GenericObserver[] {
-        return observers.redraw;
-    }
-    public static get speedChangeObservers(): SpeedObserver[] {
-        return observers.speedChange;
-    }
-    public static get presetObservers(): GenericObserver[] {
-        return observers.presetChange;
-    }
-
-    private constructor() {}
-}
 
 /* === EVENTS BINDING ================================================= */
 
@@ -186,6 +118,77 @@ Range.addObserver(controlId.ORDER, (o: number) => {
     order = o;
     callObservers(observers.clear);
 });
+
+/* === INTERFACE ====================================================== */
+/**
+ * Class giving access to all the parameters of the application. Also gives access to event handlers.
+ */
+class Parameters {
+    public static get preset(): EPreset {
+        return preset;
+    }
+
+    public static get speed(): number {
+        return speed;
+    }
+
+    public static get persistence(): boolean {
+        return persistence;
+    }
+
+    public static get closeLoop(): boolean {
+        return closeLoop;
+    }
+
+    public static get repeat(): boolean {
+        return repeat;
+    }
+
+    public static get displayCircles(): boolean {
+        return displayCircles;
+    }
+
+    public static get displaySegments(): boolean {
+        return displaySegments;
+    }
+
+    public static get displayCurve(): boolean {
+        return displayCurve;
+    }
+
+    public static get displayOriginalCurve(): boolean {
+        return displayOriginalCurve;
+    }
+
+    public static get order(): number {
+        return order;
+    }
+
+    public static get integrationPrecision(): number {
+        const integrationStepSize = 1; // one space-unit per integration step
+        return 1 / integrationStepSize;
+    }
+
+    public static get curvePrecision(): number {
+        const stepSize = 2; // sampling every two space-units
+        return 1 / stepSize;
+    }
+
+    public static get clearObservers(): GenericObserver[] {
+        return observers.clear;
+    }
+    public static get redrawObservers(): GenericObserver[] {
+        return observers.redraw;
+    }
+    public static get speedChangeObservers(): SpeedObserver[] {
+        return observers.speedChange;
+    }
+    public static get presetObservers(): GenericObserver[] {
+        return observers.presetChange;
+    }
+
+    private constructor() {}
+}
 
 export {
     Parameters,

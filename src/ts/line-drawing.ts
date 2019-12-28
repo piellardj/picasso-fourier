@@ -1,10 +1,9 @@
 import { FourierSeries, IFourierCoefficient } from "./fourier-series";
+import * as Log from "./log";
 import { Parameters } from "./parameters";
 import { distance, equals, interpolate, IPoint } from "./point";
+import { StopWatch } from "./stopwatch";
 import { SpaceUnit, TimeUnit } from "./units";
-
-import Log from "./log";
-import StopWatch from "./stopwatch";
 
 /**
  * Represents a 2D line parametrized by a 1D input.
@@ -13,8 +12,8 @@ import StopWatch from "./stopwatch";
  * The 2D output is called Space.
  */
 class LineDrawing {
-    public readonly pathLength: SpaceUnit; // length of the total path in space-units
-    public readonly originalPathLength: TimeUnit; // length of the original path in time-units
+    public readonly pathLength: SpaceUnit; // Length of the total path in space-units
+    public readonly originalPathLength: TimeUnit; // Length of the original path in time-units
     private readonly points: IPoint[];
 
     /**
@@ -149,10 +148,12 @@ class LineDrawing {
             });
         }
 
-        Log.message("Computed " + order + " Fourier coefficient with " +
-            nbSteps + " integration steps in " + stopwatch.milliseconds + " ms.");
+        Log.message(`Computed ${order} Fourier coefficient with ${nbSteps} integration steps ` +
+            `in ${stopwatch.milliseconds} ms.`);
         return new FourierSeries(coefficients, this.pathLength);
     }
 }
 
-export default LineDrawing;
+export {
+    LineDrawing,
+};
