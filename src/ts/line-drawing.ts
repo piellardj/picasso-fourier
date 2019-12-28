@@ -1,25 +1,11 @@
 import { FourierSeries, IFourierCoefficient } from "./fourier-series";
 import { Parameters } from "./parameters";
-import IPoint from "./point";
+import { distance, interpolate, IPoint } from "./point";
 
 import Log from "./log";
 import StopWatch from "./stopwatch";
 
 class LineDrawing {
-    /* Assumes t is between 0 and 1 included. */
-    private static interpolate(p1: IPoint, p2: IPoint, t: number): IPoint {
-        return {
-            x: p1.x * (1 - t) + p2.x * t,
-            y: p1.y * (1 - t) + p2.y * t,
-        };
-    }
-
-    private static distance(p1: IPoint, p2: IPoint): number {
-        const dX = p1.x - p2.x;
-        const dY = p1.y - p2.y;
-        return Math.sqrt(dX * dX + dY * dY);
-    }
-
     public readonly pathLength: number; // length of the input path
     private readonly points: IPoint[];
     private readonly extendedPathLength: number; // length of the actual path, potentially extended to make it periodic
@@ -29,7 +15,7 @@ class LineDrawing {
 
         this.pathLength = 0;
         for (let i = 0; i < this.points.length - 1; i++) {
-            this.pathLength += LineDrawing.distance(this.points[i], this.points[i + 1]);
+            this.pathLength += distance(this.points[i], this.points[i + 1]);
         }
 
         this.extendedPathLength = this.pathLength;
@@ -38,7 +24,7 @@ class LineDrawing {
         const firstPoint = this.points[0];
         const lastPoint = this.points[this.points.length - 1];
         if (firstPoint.x !== lastPoint.x || firstPoint.y !== lastPoint.y) {
-            this.extendedPathLength += LineDrawing.distance(lastPoint, firstPoint);
+            this.extendedPathLength += distance(lastPoint, firstPoint);
             this.points.push({
                 x: firstPoint.x,
                 y: firstPoint.y,
@@ -60,16 +46,16 @@ class LineDrawing {
         for (i = 0; i < this.points.length - 1; i++) {
             const lastPoint = this.points[i];
             const nextPoint = this.points[i + 1];
-            const segmentLength = LineDrawing.distance(lastPoint, nextPoint);
+            const segmentLength = distance(lastPoint, nextPoint);
 
             if (currentLength + segmentLength < desiredLength) {
                 currentLength += segmentLength;
                 context.lineTo(nextPoint.x, nextPoint.y);
             } else {
                 const interpolationFactor = (desiredLength - currentLength) / segmentLength;
-                const finalPoint = LineDrawing.interpolate(lastPoint, nextPoint, interpolationFactor);
+                const finalPoint = interpolate(lastPoint, nextPoint, interpolationFactor);
                 context.lineTo(finalPoint.x, finalPoint.y);
-                currentLength += LineDrawing.distance(lastPoint, finalPoint);
+                currentLength += distance(lastPoint, finalPoint);
                 break;
             }
         }
@@ -103,14 +89,14 @@ class LineDrawing {
                 for (let iPoint = lastPointIndex; iPoint < this.points.length - 1; iPoint++) {
                     const lastPoint = this.points[iPoint];
                     const nextPoint = this.points[iPoint + 1];
-                    const segmentLength = LineDrawing.distance(lastPoint, nextPoint);
+                    const segmentLength = distance(lastPoint, nextPoint);
 
                     if (currentLength + segmentLength < desiredLength) {
                         currentLength += segmentLength;
                         lastPointIndex = iPoint + 1;
                     } else {
                         const interpolationFactor = (desiredLength - currentLength) / segmentLength;
-                        const exactPoint = LineDrawing.interpolate(lastPoint, nextPoint, interpolationFactor);
+                        const exactPoint = interpolate(lastPoint, nextPoint, interpolationFactor);
                         samples.push({
                             x: exactPoint.x,
                             y: exactPoint.y,

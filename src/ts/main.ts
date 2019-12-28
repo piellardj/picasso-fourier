@@ -1,6 +1,6 @@
 import { FourierSeries } from "./fourier-series";
 import LineDrawing from "./line-drawing";
-import IPoint from "./point";
+import { IPoint } from "./point";
 
 import Clock from "./clock";
 import { Parameters } from "./parameters";

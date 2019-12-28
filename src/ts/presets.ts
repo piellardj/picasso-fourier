@@ -1,5 +1,5 @@
 import Log from "./log";
-import IPoint from "./point";
+import { IPoint } from "./point";
 import StopWatch from "./stopwatch";
 
 /* Enum values must match the values of the controls */

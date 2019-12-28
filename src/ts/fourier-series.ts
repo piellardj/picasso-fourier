@@ -1,5 +1,5 @@
 import { Parameters } from "./parameters";
-import IPoint from "./point";
+import { IPoint } from "./point";
 
 interface IFourierCoefficient {
     magnitude: number;
