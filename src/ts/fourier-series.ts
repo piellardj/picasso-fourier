@@ -18,8 +18,8 @@ const TWO_PI = 2 * Math.PI;
 class FourierSeries {
     private readonly coefficients: IFourierCoefficient[];
     private readonly maxOrder: number;
-
     private readonly curveStepSize: SpaceUnit;
+
     private partialCurve: IPoint[];
     private partialCurveOrder: number;
 
@@ -90,7 +90,7 @@ class FourierSeries {
 
             let x = this.partialCurve[i].x;
             let y = this.partialCurve[i].y;
-            
+
             for (const coefficient of additionalCoefficients) {
                 const TWO_PI_N_T = TWO_PI_T * coefficient.n;
                 x += f * coefficient.magnitude * Math.cos(TWO_PI_N_T + coefficient.phase);
@@ -178,56 +178,43 @@ class FourierSeries {
      * If this index is not an integer, it means an interpolation should be performed.
      */
     private completeCurve(order: number, t: TimeUnit): number {
+        function completePoint(point: IPoint, coefficients: IFourierCoefficient[], localT: TimeUnit): void {
+            const TWO_PI_T = TWO_PI * localT;
+            for (const coefficient of coefficients) {
+                const TWO_PI_N_T = TWO_PI_T * coefficient.n;
+                point.x += coefficient.magnitude * Math.cos(TWO_PI_N_T + coefficient.phase);
+                point.y += coefficient.magnitude * Math.sin(TWO_PI_N_T + coefficient.phase);
+            }
+        }
+
         order = Math.floor(order);
 
         if (order < this.partialCurveOrder) {
+            // Existing points are computed with too high order. Restart from scratch.
             this.resetCurve();
-        }
-
-        // Complete existing points with missing orders if needed
-        if (order > this.partialCurveOrder) {
+        } else if (order > this.partialCurveOrder) {
+            // Existing points are computed with too low order. Complete existing points with missing orders.
             const missingCoefficients = this.getCoefficients(this.partialCurveOrder + 1, order);
 
             for (let i = 0; i < this.partialCurve.length; i++) {
                 const localT = i * this.curveStepSize;
-                const TWO_PI_T = TWO_PI * localT;
-                const point = this.partialCurve[i];
-                
-                for (const coefficient of missingCoefficients) {
-                    const TWO_PI_N_T = TWO_PI_T * coefficient.n;
-                    point.x += coefficient.magnitude * Math.cos(TWO_PI_N_T + coefficient.phase);
-                    point.y += coefficient.magnitude * Math.sin(TWO_PI_N_T + coefficient.phase);
-                }
+                completePoint(this.partialCurve[i], missingCoefficients, localT);
             }
         }
 
         // Compute new points if needed
         const currentPointIndex = t / this.curveStepSize;
         const nextPointIndex = Math.ceil(currentPointIndex);
-        let point: IPoint;
 
+        const neededCoefficients = this.getCoefficients(0, order);
         for (let i = this.partialCurve.length; i <= nextPointIndex + 1; i++) {
-            point = this.computePoint(order, i * this.curveStepSize);
+            const point: IPoint = { x: 0, y: 0 };
+            completePoint(point, neededCoefficients, i * this.curveStepSize);
             this.partialCurve.push(point);
         }
 
         this.partialCurveOrder = order;
         return currentPointIndex;
-    }
-
-    /* Assumes t is between 0 and 1 included. */
-    private computePoint(order: number, t: TimeUnit): IPoint {
-        let x = 0;
-        let y = 0;
-
-        const coefficients = this.getCoefficients(0, order);
-        for (const coefficient of coefficients) {
-            const TWO_PI_N_T = TWO_PI * coefficient.n * t;
-            x += coefficient.magnitude * Math.cos(TWO_PI_N_T + coefficient.phase);
-            y += coefficient.magnitude * Math.sin(TWO_PI_N_T + coefficient.phase);
-        }
-
-        return { x, y };
     }
 
     /**
