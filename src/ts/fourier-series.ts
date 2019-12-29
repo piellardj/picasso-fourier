@@ -92,9 +92,9 @@ class FourierSeries {
             let y = this.partialCurve[i].y;
 
             for (const coefficient of additionalCoefficients) {
-                const TWO_PI_N_T = TWO_PI_T * coefficient.n;
-                x += f * coefficient.magnitude * Math.cos(TWO_PI_N_T + coefficient.phase);
-                y += f * coefficient.magnitude * Math.sin(TWO_PI_N_T + coefficient.phase);
+                const currentPhase = TWO_PI_T * coefficient.n + coefficient.phase;
+                x += f * coefficient.magnitude * Math.cos(currentPhase);
+                y += f * coefficient.magnitude * Math.sin(currentPhase);
             }
 
             if (i === 0) {
@@ -125,9 +125,9 @@ class FourierSeries {
 
         const coefficients = this.getCoefficients(1, order);
         for (const coefficient of coefficients) {
-            const TWO_PI_N_T = TWO_PI_T * coefficient.n;
-            x += coefficient.magnitude * Math.cos(TWO_PI_N_T + coefficient.phase);
-            y += coefficient.magnitude * Math.sin(TWO_PI_N_T + coefficient.phase);
+            const currentPhase = TWO_PI_T * coefficient.n + coefficient.phase;
+            x += coefficient.magnitude * Math.cos(currentPhase);
+            y += coefficient.magnitude * Math.sin(currentPhase);
 
             context.lineTo(x, y);
         }
@@ -165,9 +165,9 @@ class FourierSeries {
                 drawCircle(x, y, coefficient.magnitude);
             }
 
-            const TWO_PI_N_T = TWO_PI_T * coefficient.n;
-            x += coefficient.magnitude * Math.cos(TWO_PI_N_T + coefficient.phase);
-            y += coefficient.magnitude * Math.sin(TWO_PI_N_T + coefficient.phase);
+            const currentPhase = TWO_PI_T * coefficient.n + coefficient.phase;
+            x += coefficient.magnitude * Math.cos(currentPhase);
+            y += coefficient.magnitude * Math.sin(currentPhase);
         }
     }
 
@@ -181,9 +181,9 @@ class FourierSeries {
         function completePoint(point: IPoint, coefficients: IFourierCoefficient[], localT: TimeUnit): void {
             const TWO_PI_T = TWO_PI * localT;
             for (const coefficient of coefficients) {
-                const TWO_PI_N_T = TWO_PI_T * coefficient.n;
-                point.x += coefficient.magnitude * Math.cos(TWO_PI_N_T + coefficient.phase);
-                point.y += coefficient.magnitude * Math.sin(TWO_PI_N_T + coefficient.phase);
+                const currentPhase = TWO_PI_T * coefficient.n + coefficient.phase;
+                point.x += coefficient.magnitude * Math.cos(currentPhase);
+                point.y += coefficient.magnitude * Math.sin(currentPhase);
             }
         }
 
