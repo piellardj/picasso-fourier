@@ -1,5 +1,5 @@
 import { Parameters } from "./parameters";
-import { IPoint } from "./point";
+import { interpolate, IPoint } from "./point";
 import { SpaceUnit, TimeUnit } from "./units";
 
 interface IFourierCoefficient {
@@ -34,30 +34,23 @@ class FourierSeries {
     }
 
     public drawCurve(context: CanvasRenderingContext2D, order: number, t: TimeUnit): void {
-        if (order !== this.partialCurveOrder) {
-            this.partialCurveOrder = order;
-            this.resetCurve();
-        }
+        this.completeCurve(order, t);
 
-        // Compute partial curve
         const currentPointIndex = t / this.curveStepSize;
         const lastConsolidatedPointIndex = Math.floor(currentPointIndex);
-        const nextConsolidatedPointIndex = Math.ceil(currentPointIndex);
-        let point: IPoint;
-
-        for (let i = this.partialCurve.length; i <= lastConsolidatedPointIndex; i++) {
-            point = this.computePoint(order, i * this.curveStepSize);
-            this.partialCurve.push(point);
-        }
 
         // Draw partial curve
         context.beginPath();
         context.moveTo(this.partialCurve[0].x, this.partialCurve[0].y);
-        for (let i = 1; i < nextConsolidatedPointIndex; i++) {
+        for (let i = 1; i <= lastConsolidatedPointIndex; i++) {
             context.lineTo(this.partialCurve[i].x, this.partialCurve[i].y);
         }
 
-        point = this.computePoint(order, t);
+        const f = currentPointIndex % 1;
+        const lastPoint = this.partialCurve[lastConsolidatedPointIndex];
+        const nextPoint = this.partialCurve[lastConsolidatedPointIndex + 1];
+
+        const point = interpolate(lastPoint, nextPoint, f);
         context.lineTo(point.x, point.y);
 
         context.stroke();
@@ -147,6 +140,23 @@ class FourierSeries {
             const TWO_PI_N_T = TWO_PI_T * coefficient.n;
             x += coefficient.magnitude * Math.cos(TWO_PI_N_T + coefficient.phase);
             y += coefficient.magnitude * Math.sin(TWO_PI_N_T + coefficient.phase);
+        }
+    }
+
+    private completeCurve(order: number, t: TimeUnit): void {
+        if (order !== this.partialCurveOrder) {
+            this.partialCurveOrder = order;
+            this.resetCurve();
+        }
+
+        // Compute partial curve
+        const currentPointIndex = t / this.curveStepSize;
+        const lastPointIndex = Math.floor(currentPointIndex);
+        let point: IPoint;
+
+        for (let i = this.partialCurve.length; i <= lastPointIndex + 1; i++) {
+            point = this.computePoint(order, i * this.curveStepSize);
+            this.partialCurve.push(point);
         }
     }
 
