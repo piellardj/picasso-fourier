@@ -1,7 +1,7 @@
 import { FourierSeries, IFourierCoefficient } from "./fourier-series";
 import * as Log from "./log";
 import { Parameters } from "./parameters";
-import { copy, distance, equals, interpolate, IPoint } from "./point";
+import { Point } from "./point";
 import { StopWatch } from "./stopwatch";
 import { SpaceUnit, TimeUnit } from "./units";
 
@@ -14,18 +14,18 @@ import { SpaceUnit, TimeUnit } from "./units";
 class LineDrawing {
     public readonly pathLength: SpaceUnit; // Length of the total path in space-units
     public readonly originalPathDuration: TimeUnit; // Length of the original path in time-units
-    private readonly points: IPoint[];
+    private readonly points: Point[];
 
     /**
      * Builds a LineDrawing from the input points.
      * If the input is not periodic, then we extend it with a last point to make the LineDrawing periodic.
      */
-    public constructor(points: IPoint[]) {
+    public constructor(points: Point[]) {
         this.points = points;
 
         let originalPathLength: SpaceUnit = 0;
         for (let i = 0; i < this.points.length - 1; i++) {
-            originalPathLength += distance(this.points[i], this.points[i + 1]);
+            originalPathLength += Point.distance(this.points[i], this.points[i + 1]);
         }
 
         let totalPathLength: SpaceUnit = originalPathLength;
@@ -33,9 +33,9 @@ class LineDrawing {
         // For Fourier series computing, artificially make the path periodic
         const firstPoint = this.points[0];
         const lastPoint = this.points[this.points.length - 1];
-        if (!equals(firstPoint, lastPoint)) {
-            totalPathLength += distance(lastPoint, firstPoint);
-            this.points.push(copy(firstPoint));
+        if (!Point.equals(firstPoint, lastPoint)) {
+            totalPathLength += Point.distance(lastPoint, firstPoint);
+            this.points.push(Point.copy(firstPoint));
         }
 
         this.pathLength = totalPathLength;
@@ -58,16 +58,16 @@ class LineDrawing {
         for (i = 0; i < this.points.length - 1; i++) {
             const lastPoint = this.points[i];
             const nextPoint = this.points[i + 1];
-            const segmentLength = distance(lastPoint, nextPoint);
+            const segmentLength = Point.distance(lastPoint, nextPoint);
 
             if (currentLength + segmentLength < desiredLength) {
                 currentLength += segmentLength;
                 context.lineTo(nextPoint.x, nextPoint.y);
             } else {
                 const interpolationFactor = (desiredLength - currentLength) / segmentLength;
-                const finalPoint = interpolate(lastPoint, nextPoint, interpolationFactor);
+                const finalPoint = Point.interpolate(lastPoint, nextPoint, interpolationFactor);
                 context.lineTo(finalPoint.x, finalPoint.y);
-                currentLength += distance(lastPoint, finalPoint);
+                currentLength += Point.distance(lastPoint, finalPoint);
                 break;
             }
         }
@@ -101,14 +101,14 @@ class LineDrawing {
                 for (let iPoint = lastPointIndex; iPoint < this.points.length - 1; iPoint++) {
                     const lastPoint = this.points[iPoint];
                     const nextPoint = this.points[iPoint + 1];
-                    const segmentLength = distance(lastPoint, nextPoint);
+                    const segmentLength = Point.distance(lastPoint, nextPoint);
 
                     if (currentLength + segmentLength < desiredLength) {
                         currentLength += segmentLength;
                         lastPointIndex = iPoint + 1;
                     } else {
                         const interpolationFactor = (desiredLength - currentLength) / segmentLength;
-                        const exactPoint = interpolate(lastPoint, nextPoint, interpolationFactor);
+                        const exactPoint = Point.interpolate(lastPoint, nextPoint, interpolationFactor);
                         samples.push({
                             x: exactPoint.x,
                             y: exactPoint.y,

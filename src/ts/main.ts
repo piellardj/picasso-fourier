@@ -3,7 +3,7 @@ import { Clock } from "./clock";
 import { FourierSeries } from "./fourier-series";
 import { LineDrawing } from "./line-drawing";
 import { Parameters } from "./parameters";
-import { IPoint } from "./point";
+import { Point } from "./point";
 import { Presets } from "./presets";
 import { TimeUnit } from "./units";
 
@@ -113,7 +113,7 @@ function main(): void {
 
         const canvasSize: number[] = Canvas.getSize();
         Canvas.showLoader(true);
-        Presets.getPreset(Parameters.preset, canvasSize, (points: IPoint[]) => {
+        Presets.getPreset(Parameters.preset, canvasSize, (points: Point[]) => {
             drawing = new LineDrawing(points);
             fourier = drawing.computeFourierSeries(300 + 1); // one more to avoid out of bounds exceptions
             needToRestart = true;

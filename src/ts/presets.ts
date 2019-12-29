@@ -1,5 +1,5 @@
 import * as Log from "./log";
-import { IPoint } from "./point";
+import { Point } from "./point";
 import { StopWatch } from "./stopwatch";
 
 /* Enum values must match the values of the controls */
@@ -23,17 +23,17 @@ const PRESET_SIZE = 512; // a preset should be dimensionned for a 512 x 512 canv
  * Tries to minimize the request by using a memory cache.
  */
 class Presets {
-    public static getPreset(preset: EPreset, wantedSize: number[], callback: (array: IPoint[]) => any): void {
+    public static getPreset(preset: EPreset, wantedSize: number[], callback: (array: Point[]) => any): void {
         const stopwatch = new StopWatch();
         let fromCache = false;
 
-        function safelyCallCallback(points: IPoint[]): void {
+        function safelyCallCallback(points: Point[]): void {
             const scaling = Math.min(wantedSize[0] / PRESET_SIZE, wantedSize[1] / PRESET_SIZE);
             const offsetX = 0.5 * (wantedSize[0] - PRESET_SIZE * scaling);
             const offsetY = 0.5 * (wantedSize[1] - PRESET_SIZE * scaling);
 
             /* Create a deep copy to keep the cache clean */
-            const copy: IPoint[] = [];
+            const copy: Point[] = [];
             for (const point of points) {
                 copy.push({
                     x: point.x * scaling + offsetX,
@@ -76,17 +76,17 @@ class Presets {
     }
 
     private static cache: {
-        [propName: string]: IPoint[];
+        [propName: string]: Point[];
     };
 
-    private static tryParsePointsArray(text: string): IPoint[] | null {
+    private static tryParsePointsArray(text: string): Point[] | null {
         if (!text) {
             return null;
         }
 
         const stopwatch = new StopWatch();
 
-        const points: IPoint[] = [];
+        const points: Point[] = [];
 
         const lines: string[] = text.split("\n");
         for (const line of lines) {

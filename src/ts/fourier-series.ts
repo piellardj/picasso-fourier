@@ -1,5 +1,5 @@
 import { Parameters } from "./parameters";
-import { copy, interpolate, IPoint } from "./point";
+import { Point} from "./point";
 import { SpaceUnit, TimeUnit } from "./units";
 
 interface IFourierCoefficient {
@@ -13,7 +13,7 @@ const TWO_PI = 2 * Math.PI;
 /**
  * Modifies the point given as argument by applying to it the provided Fourier Coefficient at the provided location.
  */
-function applyCoefficient(point: IPoint, coefficient: IFourierCoefficient, t: TimeUnit): void {
+function applyCoefficient(point: Point, coefficient: IFourierCoefficient, t: TimeUnit): void {
     const currentPhase = TWO_PI * t * coefficient.n + coefficient.phase;
     point.x += coefficient.magnitude * Math.cos(currentPhase);
     point.y += coefficient.magnitude * Math.sin(currentPhase);
@@ -22,7 +22,7 @@ function applyCoefficient(point: IPoint, coefficient: IFourierCoefficient, t: Ti
 /**
  * Modifies the point given as argument by applying to it the provided Fourier Coefficients at the provided location.
  */
-function applyCoefficientsArray(point: IPoint, coefficients: IFourierCoefficient[], t: TimeUnit): void {
+function applyCoefficientsArray(point: Point, coefficients: IFourierCoefficient[], t: TimeUnit): void {
     for (const coefficient of coefficients) {
         applyCoefficient(point, coefficient, t);
     }
@@ -37,7 +37,7 @@ class FourierSeries {
     private readonly coefficients: IFourierCoefficient[];
     private readonly curveStepSize: SpaceUnit;
 
-    private partialCurve: IPoint[];
+    private partialCurve: Point[];
     private partialCurveOrder: number;
 
     public constructor(coefficients: IFourierCoefficient[], totalLength: SpaceUnit) {
@@ -89,7 +89,7 @@ class FourierSeries {
         const lastPoint = this.partialCurve[Math.floor(lastPointIndex)];
         const nextPoint = this.partialCurve[Math.floor(lastPointIndex) + 1];
 
-        const point = interpolate(lastPoint, nextPoint, f);
+        const point = Point.interpolate(lastPoint, nextPoint, f);
         context.lineTo(point.x, point.y);
 
         context.stroke();
@@ -121,18 +121,18 @@ class FourierSeries {
         for (let i = 0; i < nbSteps; i++) {
             const localT = i * this.curveStepSize;
 
-            const nextPoint = copy(this.partialCurve[i]);
+            const nextPoint = Point.copy(this.partialCurve[i]);
             applyCoefficient(nextPoint, additionalCoefficients[0], localT);
 
-            let lastPoint: IPoint;
+            let lastPoint: Point;
             if (additionalCoefficients.length === 1) {
                 lastPoint = this.partialCurve[i];
             } else { // additionalCoefficients.length === 2
-                lastPoint = copy(nextPoint);
+                lastPoint = Point.copy(nextPoint);
                 applyCoefficient(nextPoint, additionalCoefficients[1], localT);
             }
 
-            const interpolatedPoint = interpolate(lastPoint, nextPoint, f);
+            const interpolatedPoint = Point.interpolate(lastPoint, nextPoint, f);
             if (i === 0) {
                 context.moveTo(interpolatedPoint.x, interpolatedPoint.y);
             } else {
@@ -151,7 +151,7 @@ class FourierSeries {
      * @param t Expected to be in [0, 1]
      */
     public drawSegmentsToPoint(context: CanvasRenderingContext2D, order: number, t: TimeUnit): void {
-        const point: IPoint = { x: 0, y: 0 };
+        const point: Point = { x: 0, y: 0 };
         const constantCoefficient = this.getCoefficients(0, 0)[0];
         applyCoefficient(point, constantCoefficient, 0);
 
@@ -175,7 +175,7 @@ class FourierSeries {
      * @param t Expected to be in [0, 1]
      */
     public drawCirclesToPoint(context: CanvasRenderingContext2D, order: number, t: TimeUnit): void {
-        function drawCircle(center: IPoint, radius: number): void {
+        function drawCircle(center: Point, radius: number): void {
             if (radius > 0.5) {
                 context.beginPath();
                 context.arc(center.x, center.y, radius, 0, TWO_PI);
@@ -189,7 +189,7 @@ class FourierSeries {
             return;
         }
 
-        const point: IPoint = { x: 0, y: 0 };
+        const point: Point = { x: 0, y: 0 };
 
         for (const coefficient of coefficients) {
             if (coefficient.n !== 0 && coefficient.n !== 1) {
@@ -227,7 +227,7 @@ class FourierSeries {
 
         const neededCoefficients = this.getCoefficients(0, order);
         for (let i = this.partialCurve.length; i <= nextPointIndex + 1; i++) {
-            const point: IPoint = { x: 0, y: 0 };
+            const point: Point = { x: 0, y: 0 };
             applyCoefficientsArray(point, neededCoefficients, i * this.curveStepSize);
             this.partialCurve.push(point);
         }
