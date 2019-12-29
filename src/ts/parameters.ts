@@ -27,7 +27,7 @@ const controlId = {
 
 enum EMode {
     INSTANT = "0",
-    PROGRESSIVE = "1"
+    PROGRESSIVE = "1",
 }
 
 /* === OBSERVERS ====================================================== */

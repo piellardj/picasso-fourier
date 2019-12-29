@@ -178,7 +178,7 @@ class FourierSeries {
             y += coefficient.magnitude * Math.sin(TWO_PI_N_T + coefficient.phase);
         }
 
-         const f = order % 1;
+        const f = order % 1;
         for (let i = 0; i < 2; i++) {
             const coefficient = this.coefficients[floor + i];
             const TWO_PI_N_T = TWO_PI * coefficient.n * t;
