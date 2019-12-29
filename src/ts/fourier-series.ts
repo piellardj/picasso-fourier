@@ -76,7 +76,7 @@ class FourierSeries {
      * @param t Expected to be in [0, 1]
      */
     public drawCurve(context: CanvasRenderingContext2D, order: number, t: TimeUnit): void {
-        const lastPointIndex = this.completeCurve(order, t);
+        const lastPointIndex = this.computePartialCurve(order, t);
 
         // Draw partial curve
         context.beginPath();
@@ -104,7 +104,7 @@ class FourierSeries {
      * @param t Expected to be in [0, 1]. Is not garanteed to be respected, approximations will be performed.
      */
     public drawCurvePartialOrder(context: CanvasRenderingContext2D, order: number, t: TimeUnit): void {
-        this.completeCurve(order, t);
+        this.computePartialCurve(order, t);
 
         let additionalCoefficients = this.getCoefficients(Math.floor(order) + 1, Math.floor(order) + 1);
         let f = order % 1;
@@ -205,7 +205,7 @@ class FourierSeries {
      * Returns the index of the 't' point in the partial curve.
      * If this index is not an integer, it means an interpolation should be performed.
      */
-    private completeCurve(order: number, t: TimeUnit): number {
+    private computePartialCurve(order: number, t: TimeUnit): number {
         order = Math.floor(order);
 
         if (order < this.partialCurveOrder) {
