@@ -53,21 +53,18 @@ class FourierSeries {
     }
 
     public drawCurve(context: CanvasRenderingContext2D, order: number, t: TimeUnit): void {
-        this.completeCurve(order, t);
-
-        const currentPointIndex = t / this.curveStepSize;
-        const lastConsolidatedPointIndex = Math.floor(currentPointIndex);
+        const lastPointIndex = this.completeCurve(order, t);
 
         // Draw partial curve
         context.beginPath();
         context.moveTo(this.partialCurve[0].x, this.partialCurve[0].y);
-        for (let i = 1; i <= lastConsolidatedPointIndex; i++) {
+        for (let i = 1; i < lastPointIndex; i++) {
             context.lineTo(this.partialCurve[i].x, this.partialCurve[i].y);
         }
 
-        const f = currentPointIndex % 1;
-        const lastPoint = this.partialCurve[lastConsolidatedPointIndex];
-        const nextPoint = this.partialCurve[lastConsolidatedPointIndex + 1];
+        const f = lastPointIndex % 1;
+        const lastPoint = this.partialCurve[Math.floor(lastPointIndex)];
+        const nextPoint = this.partialCurve[Math.floor(lastPointIndex) + 1];
 
         const point = interpolate(lastPoint, nextPoint, f);
         context.lineTo(point.x, point.y);
@@ -174,7 +171,13 @@ class FourierSeries {
         }
     }
 
-    private completeCurve(order: number, t: TimeUnit): void {
+    /**
+     * Computes the partial curve between 0 and t in the given order.
+     * The partial curve serves as cache and is as reused as possible.
+     * Returns the index of the 't' point in the partial curve.
+     * If this index is not an integer, it means an interpolation should be performed.
+     */
+    private completeCurve(order: number, t: TimeUnit): number {
         order = Math.floor(order);
 
         if (order < this.partialCurveOrder) {
@@ -200,19 +203,20 @@ class FourierSeries {
 
         // Compute new points if needed
         const currentPointIndex = t / this.curveStepSize;
-        const lastPointIndex = Math.floor(currentPointIndex);
+        const nextPointIndex = Math.ceil(currentPointIndex);
         let point: IPoint;
 
-        for (let i = this.partialCurve.length; i <= lastPointIndex + 1; i++) {
+        for (let i = this.partialCurve.length; i <= nextPointIndex + 1; i++) {
             point = this.computePoint(order, i * this.curveStepSize);
             this.partialCurve.push(point);
         }
 
         this.partialCurveOrder = order;
+        return currentPointIndex;
     }
 
     /* Assumes t is between 0 and 1 included. */
-    private computePoint(order: number, t: number): IPoint {
+    private computePoint(order: number, t: TimeUnit): IPoint {
         let x = 0;
         let y = 0;
 
