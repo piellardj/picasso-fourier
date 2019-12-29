@@ -63,10 +63,18 @@ class FourierSeries {
         this.curveStepSize = 1 / (Parameters.curvePrecision * totalLength);
     }
 
+    /**
+     * Purges the internal cache of the class. Should not be called too often.
+     */
     public resetCurve(): void {
         this.partialCurve = [];
     }
 
+    /**
+     * Draws the [0, t] curve portion at the specified integer Fourier order.
+     * @param order Expected to be an integer
+     * @param t Expected to be in [0, 1]
+     */
     public drawCurve(context: CanvasRenderingContext2D, order: number, t: TimeUnit): void {
         const lastPointIndex = this.completeCurve(order, t);
 
@@ -88,6 +96,12 @@ class FourierSeries {
         context.closePath();
     }
 
+    /**
+     * Draws the [0, approx. t] curve portion at the specified Fourier order.
+     * The order is precisely interpolated, however the curve's end (t parameter is rounded to nearest).
+     * @param order If not an integer, then an intterpolation is performed to make sense of decimal Fourier order.
+     * @param t Expected to be in [0, 1]. Is not garanteed to be respected, approximations will be performed.
+     */
     public drawCurvePartialOrder(context: CanvasRenderingContext2D, order: number, t: TimeUnit): void {
         this.completeCurve(order, t);
 
