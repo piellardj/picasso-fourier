@@ -32,6 +32,7 @@ class Clock {
         this.paused = false;
         this.lastCheckpoint.clockTime = 0;
         this.lastCheckpoint.realTime = performance.now();
+        this.setSpeed(Parameters.speed);
     }
 
     public setSpeed(speed: number): void {

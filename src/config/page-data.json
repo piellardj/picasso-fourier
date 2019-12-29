@@ -74,6 +74,23 @@
                     ]
                 },
                 {
+                    "title": "Mode",
+                    "type": "tabs",
+                    "id": "mode-picker-id",
+                    "unique": true,
+                    "options": [
+                        {
+                            "value": "0",
+                            "label": "Draw",
+                            "checked": true
+                        },
+                        {
+                            "value": "1",
+                            "label": "Progressive"
+                        }
+                    ]
+                },
+                {
                     "title": "Speed",
                     "type": "range",
                     "id": "speed-range-id",

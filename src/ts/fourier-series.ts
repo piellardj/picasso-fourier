@@ -64,6 +64,24 @@ class FourierSeries {
         context.closePath();
     }
 
+    public drawCurvePartialOrder(context: CanvasRenderingContext2D, order: number, t: TimeUnit): void {
+        order = Math.min(order, 0.5 * (this.coefficients.length - 1) - 0.001);
+
+        context.beginPath();
+
+        const firstPoint = this.computePointPartialOrder(order, 0);
+        context.moveTo(firstPoint.x, firstPoint.y);
+
+        const nbSteps = t / this.curveStepSize;
+        for (let i = 1; i < nbSteps; i++) {
+            const p = this.computePointPartialOrder(order, i * this.curveStepSize);
+            context.lineTo(p.x, p.y);
+        }
+
+        context.stroke();
+        context.closePath();
+    }
+
     /**
      * Draws the [0, t] portion of the approximated curve.
      * @param order Maximum Fourier order to use. Coefficients -order, -order+1, ..., 0, ..., +order will be used.
@@ -146,6 +164,29 @@ class FourierSeries {
         }
 
         return { x, y };
+    }
+
+    private computePointPartialOrder(order: number, t: number): IPoint {
+        let x = 0;
+        let y = 0;
+
+        const floor = this.computeAmountOfCoefficients(Math.floor(order));
+        for (let i = 0; i < floor; i++) {
+            const coefficient = this.coefficients[i];
+            const TWO_PI_N_T = TWO_PI * coefficient.n * t;
+            x += coefficient.magnitude * Math.cos(TWO_PI_N_T + coefficient.phase);
+            y += coefficient.magnitude * Math.sin(TWO_PI_N_T + coefficient.phase);
+        }
+
+         const f = order % 1;
+        for (let i = 0; i < 2; i++) {
+            const coefficient = this.coefficients[floor + i];
+            const TWO_PI_N_T = TWO_PI * coefficient.n * t;
+            x += f * coefficient.magnitude * Math.cos(TWO_PI_N_T + coefficient.phase);
+            y += f * coefficient.magnitude * Math.sin(TWO_PI_N_T + coefficient.phase);
+        }
+
+        return {x, y};
     }
 
     private computeAmountOfCoefficients(order: number): number {

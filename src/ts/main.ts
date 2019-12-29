@@ -9,6 +9,11 @@ import { TimeUnit } from "./units";
 
 declare const Canvas: any;
 
+function setOrderIndicator(value: number): void {
+    value = Math.round(10 * value) / 10;
+    Canvas.setIndicatorText("fourier-order", value.toLocaleString());
+}
+
 function main(): void {
     const canvas2D = new Canvas2D("canvas");
     const context = canvas2D.context;
@@ -52,7 +57,7 @@ function main(): void {
                 fourier.resetCurve();
                 t = 0;
                 finishedLoop = false;
-                Canvas.setIndicatorText("fourier-order", Parameters.order.toLocaleString());
+                setOrderIndicator(Parameters.order);
                 canvas2D.clear();
             }
 
@@ -68,7 +73,7 @@ function main(): void {
                     const previousWidth = context.lineWidth;
                     context.lineWidth = 2;
 
-                    drawing.draw(context, t);
+                    drawing.draw(context, Parameters.isProgressiveMode ? maxT : t);
 
                     context.lineWidth = previousWidth;
                 }
@@ -86,6 +91,13 @@ function main(): void {
                 if (Parameters.displaySegments) {
                     context.strokeStyle = Parameters.persistence ? "rgba(255,0,0,0.01)" : "red";
                     fourier.drawPathToPoint(context, Parameters.order, t);
+                }
+
+                if (Parameters.isProgressiveMode) {
+                    context.strokeStyle = Parameters.persistence ? "rgba(255,255,255,0.01)" : "white";
+                    const order = Parameters.order * t / maxT;
+                    fourier.drawCurvePartialOrder(context, order, maxT);
+                    setOrderIndicator(order);
                 }
             }
 
