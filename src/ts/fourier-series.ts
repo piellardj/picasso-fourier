@@ -23,6 +23,19 @@ class FourierSeries {
     private partialCurveOrder: number;
 
     public constructor(coefficients: IFourierCoefficient[], totalLength: SpaceUnit) {
+        if (coefficients.length === 0) {
+            throw new Error("Fourier series must have at least one coefficient.");
+        }
+
+        // Sort the coefs in that order: 0, 1, -1, 2, -2, 3, -3, ...
+        coefficients.sort((a: IFourierCoefficient, b: IFourierCoefficient) => {
+            const absA = Math.abs(a.n);
+            const absB = Math.abs(b.n);
+            if (absA !== absB) {
+                return absA - absB;
+            }
+            return b.n - a.n;
+        });
         this.coefficients = coefficients;
 
         this.partialCurve = [];
@@ -81,21 +94,17 @@ class FourierSeries {
      * @param t Expected to be in [0, 1]
      */
     public drawPathToPoint(context: CanvasRenderingContext2D, order: number, t: TimeUnit): void {
-        const max = this.computeAmountOfCoefficients(order);
-        if (max <= 0) {
-            return;
-        }
-
-        let x = this.coefficients[0].magnitude * Math.cos(this.coefficients[0].phase);
-        let y = this.coefficients[0].magnitude * Math.sin(this.coefficients[0].phase);
+        const constantCoefficient = this.getCoefficients(0, 0)[0];
+        let x = constantCoefficient.magnitude * Math.cos(constantCoefficient.phase);
+        let y = constantCoefficient.magnitude * Math.sin(constantCoefficient.phase);
 
         const TWO_PI_T = TWO_PI * t;
 
         context.beginPath();
         context.moveTo(x, y);
 
-        for (let i = 1; i < max; i++) {
-            const coefficient = this.coefficients[i];
+        const coefficients = this.getCoefficients(1, order);
+        for (const coefficient of coefficients) {
             const TWO_PI_N_T = TWO_PI_T * coefficient.n;
             x += coefficient.magnitude * Math.cos(TWO_PI_N_T + coefficient.phase);
             y += coefficient.magnitude * Math.sin(TWO_PI_N_T + coefficient.phase);
@@ -114,26 +123,25 @@ class FourierSeries {
      */
     public drawCircles(context: CanvasRenderingContext2D, order: number, t: TimeUnit): void {
         function drawCircle(centerX: number, centerY: number, radius: number): void {
-            context.beginPath();
-            context.arc(centerX, centerY, radius, 0, TWO_PI);
-            context.closePath();
-            context.stroke();
+            if (radius > 0.5) {
+                context.beginPath();
+                context.arc(centerX, centerY, radius, 0, TWO_PI);
+                context.closePath();
+                context.stroke();
+            }
         }
-
-        const max = this.computeAmountOfCoefficients(order);
-        if (max < 2) {
-            return;
-        }
-
-        const TWO_PI_T = TWO_PI * t;
 
         let x = 0;
         let y = 0;
 
-        for (let i = 0; i < max; i++) {
-            const coefficient = this.coefficients[i];
+        const coefficients = this.getCoefficients(0, order);
+        if (coefficients.length < 2) {
+            return;
+        }
 
-            if (i > 1) {
+        const TWO_PI_T = TWO_PI * t;
+        for (const coefficient of coefficients) {
+            if (coefficient.n !== 0 && coefficient.n !== 1) {
                 drawCircle(x, y, coefficient.magnitude);
             }
 
@@ -144,6 +152,8 @@ class FourierSeries {
     }
 
     private completeCurve(order: number, t: TimeUnit): void {
+        order = Math.floor(order);
+
         if (order !== this.partialCurveOrder) {
             this.partialCurveOrder = order;
             this.resetCurve();
@@ -165,9 +175,8 @@ class FourierSeries {
         let x = 0;
         let y = 0;
 
-        const max = this.computeAmountOfCoefficients(order);
-        for (let i = 0; i < max; i++) {
-            const coefficient = this.coefficients[i];
+        const coefficients = this.getCoefficients(0, order);
+        for (const coefficient of coefficients) {
             const TWO_PI_N_T = TWO_PI * coefficient.n * t;
             x += coefficient.magnitude * Math.cos(TWO_PI_N_T + coefficient.phase);
             y += coefficient.magnitude * Math.sin(TWO_PI_N_T + coefficient.phase);
@@ -180,27 +189,37 @@ class FourierSeries {
         let x = 0;
         let y = 0;
 
-        const floor = this.computeAmountOfCoefficients(Math.floor(order));
-        for (let i = 0; i < floor; i++) {
-            const coefficient = this.coefficients[i];
+        const coefficients = this.getCoefficients(0, Math.floor(order));
+        for (const coefficient of coefficients) {
             const TWO_PI_N_T = TWO_PI * coefficient.n * t;
             x += coefficient.magnitude * Math.cos(TWO_PI_N_T + coefficient.phase);
             y += coefficient.magnitude * Math.sin(TWO_PI_N_T + coefficient.phase);
         }
 
+        const additionalCoefficients = this.getCoefficients(Math.floor(order) + 1, Math.floor(order) + 1);
         const f = order % 1;
-        for (let i = 0; i < 2; i++) {
-            const coefficient = this.coefficients[floor + i];
+        for (const coefficient of additionalCoefficients) {
             const TWO_PI_N_T = TWO_PI * coefficient.n * t;
             x += f * coefficient.magnitude * Math.cos(TWO_PI_N_T + coefficient.phase);
             y += f * coefficient.magnitude * Math.sin(TWO_PI_N_T + coefficient.phase);
         }
 
-        return {x, y};
+        return { x, y };
     }
 
-    private computeAmountOfCoefficients(order: number): number {
-        return Math.min(this.coefficients.length, 1 + 2 * order);
+    /**
+     * Returns an array of coefficients containing, in that order:
+     * if orderFrom > 0: orderFrom, -orderFrom, orderFrom+1, -(orderFrom+1), ..., orderTo, -orderTo
+     * if orderFrom == 0: 0, 1, -1, ... orderTo, -orderTo
+     * If orderFrom > orderTo, or if one of the parameters is out of range, only returns the valid coefficients.
+     */
+    private getCoefficients(orderFrom: number, orderTo: number): IFourierCoefficient[] {
+        orderFrom = Math.min(orderFrom, orderTo);
+
+        const firstIndex = Math.max(0, 2 * orderFrom - 1);
+        const lastIndex = Math.min(this.coefficients.length, 2 * orderTo + 1);
+
+        return this.coefficients.slice(firstIndex, lastIndex);
     }
 }
 
