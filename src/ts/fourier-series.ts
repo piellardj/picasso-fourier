@@ -22,7 +22,7 @@ function applyCoefficient(point: IPoint, coefficient: IFourierCoefficient, t: Ti
 /**
  * Modifies the point given as argument by applying to it the provided Fourier Coefficients at the provided location.
  */
-function completePoint(point: IPoint, coefficients: IFourierCoefficient[], t: TimeUnit): void {
+function applyCoefficientsArray(point: IPoint, coefficients: IFourierCoefficient[], t: TimeUnit): void {
     for (const coefficient of coefficients) {
         applyCoefficient(point, coefficient, t);
     }
@@ -98,29 +98,48 @@ class FourierSeries {
 
     /**
      * Draws the [0, approx. t] curve portion at the specified Fourier order.
-     * The order is precisely interpolated, however the curve's end (t parameter is rounded to nearest).
+     * The order is linearily interpolated between the nearest coefficients.
+     * The curve's end (t parameter) is rounded to nearest.
      * @param order If not an integer, then an intterpolation is performed to make sense of decimal Fourier order.
      * @param t Expected to be in [0, 1]. Is not garanteed to be respected, approximations will be performed.
      */
     public drawCurvePartialOrder(context: CanvasRenderingContext2D, order: number, t: TimeUnit): void {
         this.completeCurve(order, t);
 
-        const additionalCoefficients = this.getCoefficients(Math.floor(order) + 1, Math.floor(order) + 1);
-        const f = order % 1;
+        let additionalCoefficients = this.getCoefficients(Math.floor(order) + 1, Math.floor(order) + 1);
+        let f = order % 1;
+        if (f < 0.5) {
+            additionalCoefficients = [additionalCoefficients[0]];
+            f *= 2;
+        } else {
+            f = 2 * f - 1;
+        }
 
         context.beginPath();
 
         const nbSteps = t / this.curveStepSize;
         for (let i = 0; i < nbSteps; i++) {
+            const localT = i * this.curveStepSize;
             const nextPoint: IPoint = {
                 x: this.partialCurve[i].x,
                 y: this.partialCurve[i].y,
             };
-            completePoint(nextPoint, additionalCoefficients, i * this.curveStepSize);
 
-            // linear interpolation
-            const interpolatedPoint = interpolate(this.partialCurve[i], nextPoint, f);
+            applyCoefficient(nextPoint, additionalCoefficients[0], localT);
 
+            let lastPoint: IPoint;
+            if (additionalCoefficients.length === 1) {
+                lastPoint = this.partialCurve[i];
+            } else { // additionalCoefficients.length === 2
+                lastPoint = {
+                    x: nextPoint.x,
+                    y: nextPoint.y,
+                };
+
+                applyCoefficient(nextPoint, additionalCoefficients[1], localT);
+            }
+
+            const interpolatedPoint = interpolate(lastPoint, nextPoint, f);
             if (i === 0) {
                 context.moveTo(interpolatedPoint.x, interpolatedPoint.y);
             } else {
@@ -205,7 +224,7 @@ class FourierSeries {
 
             for (let i = 0; i < this.partialCurve.length; i++) {
                 const localT = i * this.curveStepSize;
-                completePoint(this.partialCurve[i], missingCoefficients, localT);
+                applyCoefficientsArray(this.partialCurve[i], missingCoefficients, localT);
             }
         }
 
@@ -216,7 +235,7 @@ class FourierSeries {
         const neededCoefficients = this.getCoefficients(0, order);
         for (let i = this.partialCurve.length; i <= nextPointIndex + 1; i++) {
             const point: IPoint = { x: 0, y: 0 };
-            completePoint(point, neededCoefficients, i * this.curveStepSize);
+            applyCoefficientsArray(point, neededCoefficients, i * this.curveStepSize);
             this.partialCurve.push(point);
         }
 

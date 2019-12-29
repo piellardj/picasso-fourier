@@ -10,7 +10,7 @@ import { TimeUnit } from "./units";
 declare const Canvas: any;
 
 function setOrderIndicator(value: number): void {
-    value = Math.round(10 * value) / 10;
+    value = Math.round(100 * value) / 100; // 2 digits max
     Canvas.setIndicatorText("fourier-order", value.toLocaleString());
 }
 
@@ -115,7 +115,7 @@ function main(): void {
         Canvas.showLoader(true);
         Presets.getPreset(Parameters.preset, canvasSize, (points: IPoint[]) => {
             drawing = new LineDrawing(points);
-            fourier = drawing.computeFourierSeries(300);
+            fourier = drawing.computeFourierSeries(300 + 1); // one more to avoid out of bounds exceptions
             needToRestart = true;
             clock.reset();
             Canvas.showLoader(false);
