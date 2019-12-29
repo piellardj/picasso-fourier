@@ -21,7 +21,15 @@ function equals(p1: IPoint, p2: IPoint): boolean {
     return p1.x === p2.x && p1.y === p2.y;
 }
 
+function copy(point: IPoint): IPoint {
+    return {
+        x: point.x,
+        y: point.y,
+    };
+}
+
 export {
+    copy,
     distance,
     equals,
     interpolate,

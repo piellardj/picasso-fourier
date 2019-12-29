@@ -1,5 +1,5 @@
 import { Parameters } from "./parameters";
-import { interpolate, IPoint } from "./point";
+import { copy, interpolate, IPoint } from "./point";
 import { SpaceUnit, TimeUnit } from "./units";
 
 interface IFourierCoefficient {
@@ -120,22 +120,15 @@ class FourierSeries {
         const nbSteps = t / this.curveStepSize;
         for (let i = 0; i < nbSteps; i++) {
             const localT = i * this.curveStepSize;
-            const nextPoint: IPoint = {
-                x: this.partialCurve[i].x,
-                y: this.partialCurve[i].y,
-            };
 
+            const nextPoint = copy(this.partialCurve[i]);
             applyCoefficient(nextPoint, additionalCoefficients[0], localT);
 
             let lastPoint: IPoint;
             if (additionalCoefficients.length === 1) {
                 lastPoint = this.partialCurve[i];
             } else { // additionalCoefficients.length === 2
-                lastPoint = {
-                    x: nextPoint.x,
-                    y: nextPoint.y,
-                };
-
+                lastPoint = copy(nextPoint);
                 applyCoefficient(nextPoint, additionalCoefficients[1], localT);
             }
 

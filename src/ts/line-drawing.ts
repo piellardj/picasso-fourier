@@ -1,7 +1,7 @@
 import { FourierSeries, IFourierCoefficient } from "./fourier-series";
 import * as Log from "./log";
 import { Parameters } from "./parameters";
-import { distance, equals, interpolate, IPoint } from "./point";
+import { copy, distance, equals, interpolate, IPoint } from "./point";
 import { StopWatch } from "./stopwatch";
 import { SpaceUnit, TimeUnit } from "./units";
 
@@ -35,10 +35,7 @@ class LineDrawing {
         const lastPoint = this.points[this.points.length - 1];
         if (!equals(firstPoint, lastPoint)) {
             totalPathLength += distance(lastPoint, firstPoint);
-            this.points.push({
-                x: firstPoint.x,
-                y: firstPoint.y,
-            });
+            this.points.push(copy(firstPoint));
         }
 
         this.pathLength = totalPathLength;
