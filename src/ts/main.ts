@@ -80,7 +80,7 @@ function main(): void {
 
                 if (Parameters.displayCircles) {
                     context.strokeStyle = Parameters.persistence ? "rgba(255,255,255,0.01)" : "rgba(255,255,255,0.3)";
-                    fourier.drawCircles(context, Parameters.order, t);
+                    fourier.drawCirclesToPoint(context, Parameters.order, t);
                 }
 
                 if (Parameters.displayCurve) {
@@ -90,7 +90,7 @@ function main(): void {
 
                 if (Parameters.displaySegments) {
                     context.strokeStyle = Parameters.persistence ? "rgba(255,0,0,0.01)" : "red";
-                    fourier.drawPathToPoint(context, Parameters.order, t);
+                    fourier.drawSegmentsToPoint(context, Parameters.order, t);
                 }
 
                 if (Parameters.isProgressiveMode) {
