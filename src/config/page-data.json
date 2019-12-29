@@ -22,7 +22,7 @@
     },
     "controlsSections": [
         {
-            "title": "Animation",
+            "title": "Input",
             "controls": [
                 {
                     "title": "Drawing",
@@ -72,7 +72,12 @@
                             "label": "Woman 2"
                         }
                     ]
-                },
+                }
+            ]
+        },
+        {
+            "title": "Animation",
+            "controls": [
                 {
                     "title": "Mode",
                     "type": "tabs",
