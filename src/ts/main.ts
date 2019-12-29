@@ -101,7 +101,7 @@ function main(): void {
                 }
             }
 
-            needToRedraw = !finishedLoop;
+            needToRedraw = !finishedLoop && Parameters.speed > 0;
         }
 
         requestAnimationFrame(mainLoop);
