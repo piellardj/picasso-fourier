@@ -17,12 +17,18 @@ const TWO_PI = 2 * Math.PI;
  */
 class FourierSeries {
     private readonly coefficients: IFourierCoefficient[];
+    private readonly maxOrder: number;
 
     private readonly curveStepSize: SpaceUnit;
     private partialCurve: IPoint[];
     private partialCurveOrder: number;
 
     public constructor(coefficients: IFourierCoefficient[], totalLength: SpaceUnit) {
+        if (coefficients.length % 2 !== 0) { // coefficients must go in pairs of 2: 0, 1, -1, 2, -2, ...
+            coefficients.length--;
+        }
+        this.maxOrder = Math.max(0, 0.5 * (coefficients.length - 1));
+
         if (coefficients.length === 0) {
             throw new Error("Fourier series must have at least one coefficient.");
         }
@@ -71,17 +77,34 @@ class FourierSeries {
     }
 
     public drawCurvePartialOrder(context: CanvasRenderingContext2D, order: number, t: TimeUnit): void {
-        order = Math.min(order, 0.5 * (this.coefficients.length - 1) - 0.001);
+        order = Math.min(order, this.maxOrder - 0.001);
+        const f = order % 1;
+
+        this.completeCurve(order, t);
+
+        const additionalCoefficients = this.getCoefficients(Math.floor(order) + 1, Math.floor(order) + 1);
 
         context.beginPath();
 
-        const firstPoint = this.computePointPartialOrder(order, 0);
-        context.moveTo(firstPoint.x, firstPoint.y);
-
         const nbSteps = t / this.curveStepSize;
-        for (let i = 1; i < nbSteps; i++) {
-            const p = this.computePointPartialOrder(order, i * this.curveStepSize);
-            context.lineTo(p.x, p.y);
+        for (let i = 0; i < nbSteps; i++) {
+            const localT = i * this.curveStepSize;
+            const TWO_PI_T = TWO_PI * localT;
+
+            let x = this.partialCurve[i].x;
+            let y = this.partialCurve[i].y;
+            
+            for (const coefficient of additionalCoefficients) {
+                const TWO_PI_N_T = TWO_PI_T * coefficient.n;
+                x += f * coefficient.magnitude * Math.cos(TWO_PI_N_T + coefficient.phase);
+                y += f * coefficient.magnitude * Math.sin(TWO_PI_N_T + coefficient.phase);
+            }
+
+            if (i === 0) {
+                context.moveTo(x, y);
+            } else {
+                context.lineTo(x, y);
+            }
         }
 
         context.stroke();
@@ -154,12 +177,28 @@ class FourierSeries {
     private completeCurve(order: number, t: TimeUnit): void {
         order = Math.floor(order);
 
-        if (order !== this.partialCurveOrder) {
-            this.partialCurveOrder = order;
+        if (order < this.partialCurveOrder) {
             this.resetCurve();
         }
 
-        // Compute partial curve
+        // Complete existing points with missing orders if needed
+        if (order > this.partialCurveOrder) {
+            const missingCoefficients = this.getCoefficients(this.partialCurveOrder + 1, order);
+
+            for (let i = 0; i < this.partialCurve.length; i++) {
+                const localT = i * this.curveStepSize;
+                const TWO_PI_T = TWO_PI * localT;
+                const point = this.partialCurve[i];
+                
+                for (const coefficient of missingCoefficients) {
+                    const TWO_PI_N_T = TWO_PI_T * coefficient.n;
+                    point.x += coefficient.magnitude * Math.cos(TWO_PI_N_T + coefficient.phase);
+                    point.y += coefficient.magnitude * Math.sin(TWO_PI_N_T + coefficient.phase);
+                }
+            }
+        }
+
+        // Compute new points if needed
         const currentPointIndex = t / this.curveStepSize;
         const lastPointIndex = Math.floor(currentPointIndex);
         let point: IPoint;
@@ -168,6 +207,8 @@ class FourierSeries {
             point = this.computePoint(order, i * this.curveStepSize);
             this.partialCurve.push(point);
         }
+
+        this.partialCurveOrder = order;
     }
 
     /* Assumes t is between 0 and 1 included. */
@@ -180,28 +221,6 @@ class FourierSeries {
             const TWO_PI_N_T = TWO_PI * coefficient.n * t;
             x += coefficient.magnitude * Math.cos(TWO_PI_N_T + coefficient.phase);
             y += coefficient.magnitude * Math.sin(TWO_PI_N_T + coefficient.phase);
-        }
-
-        return { x, y };
-    }
-
-    private computePointPartialOrder(order: number, t: number): IPoint {
-        let x = 0;
-        let y = 0;
-
-        const coefficients = this.getCoefficients(0, Math.floor(order));
-        for (const coefficient of coefficients) {
-            const TWO_PI_N_T = TWO_PI * coefficient.n * t;
-            x += coefficient.magnitude * Math.cos(TWO_PI_N_T + coefficient.phase);
-            y += coefficient.magnitude * Math.sin(TWO_PI_N_T + coefficient.phase);
-        }
-
-        const additionalCoefficients = this.getCoefficients(Math.floor(order) + 1, Math.floor(order) + 1);
-        const f = order % 1;
-        for (const coefficient of additionalCoefficients) {
-            const TWO_PI_N_T = TWO_PI * coefficient.n * t;
-            x += f * coefficient.magnitude * Math.cos(TWO_PI_N_T + coefficient.phase);
-            y += f * coefficient.magnitude * Math.sin(TWO_PI_N_T + coefficient.phase);
         }
 
         return { x, y };
