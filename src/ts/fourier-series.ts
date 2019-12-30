@@ -1,3 +1,4 @@
+import { Canvas2D } from "./canvas-2d";
 import { Parameters } from "./parameters";
 import { Point} from "./point";
 import { SpaceUnit, TimeUnit } from "./units";
@@ -37,8 +38,8 @@ class FourierSeries {
     private readonly coefficients: IFourierCoefficient[];
     private readonly curveStepSize: SpaceUnit;
 
-    private partialCurve: Point[];
-    private partialCurveOrder: number;
+    private partialCurve: Point[] = [];
+    private partialCurveOrder: number = -1;
 
     public constructor(coefficients: IFourierCoefficient[], totalLength: SpaceUnit) {
         if (coefficients.length % 2 !== 0) { // coefficients must go in pairs of 2: 0, 1, -1, 2, -2, ...
@@ -59,7 +60,6 @@ class FourierSeries {
         });
         this.coefficients = coefficients;
 
-        this.partialCurve = [];
         this.curveStepSize = 1 / (Parameters.curvePrecision * totalLength);
     }
 
@@ -75,25 +75,23 @@ class FourierSeries {
      * @param order Expected to be an integer
      * @param t Expected to be in [0, 1]
      */
-    public drawCurve(context: CanvasRenderingContext2D, order: number, t: TimeUnit): void {
+    public drawCurve(canvas: Canvas2D, order: number, t: TimeUnit): void {
         const lastPointIndex = this.computePartialCurve(order, t);
 
         // Draw partial curve
-        context.beginPath();
-        context.moveTo(this.partialCurve[0].x, this.partialCurve[0].y);
-        for (let i = 1; i < lastPointIndex; i++) {
-            context.lineTo(this.partialCurve[i].x, this.partialCurve[i].y);
+        canvas.startLine();
+        for (let i = 0; i < lastPointIndex; i++) {
+            canvas.addPointToLine(this.partialCurve[i]);
         }
 
         const f = lastPointIndex % 1;
         const lastPoint = this.partialCurve[Math.floor(lastPointIndex)];
         const nextPoint = this.partialCurve[Math.floor(lastPointIndex) + 1];
 
-        const point = Point.interpolate(lastPoint, nextPoint, f);
-        context.lineTo(point.x, point.y);
+        const interpolatedPoint = Point.interpolate(lastPoint, nextPoint, f);
+        canvas.addPointToLine(interpolatedPoint);
 
-        context.stroke();
-        context.closePath();
+        canvas.endLine();
     }
 
     /**
@@ -103,7 +101,7 @@ class FourierSeries {
      * @param order If not an integer, then an intterpolation is performed to make sense of decimal Fourier order.
      * @param t Expected to be in [0, 1]. Is not garanteed to be respected, approximations will be performed.
      */
-    public drawCurvePartialOrder(context: CanvasRenderingContext2D, order: number, t: TimeUnit): void {
+    public drawCurvePartialOrder(canvas: Canvas2D, order: number, t: TimeUnit): void {
         this.computePartialCurve(order, t);
 
         let additionalCoefficients = this.getCoefficients(Math.floor(order) + 1, Math.floor(order) + 1);
@@ -115,7 +113,7 @@ class FourierSeries {
             f = 2 * f - 1;
         }
 
-        context.beginPath();
+        canvas.startLine();
 
         const nbSteps = t / this.curveStepSize;
         for (let i = 0; i < nbSteps; i++) {
@@ -133,15 +131,10 @@ class FourierSeries {
             }
 
             const interpolatedPoint = Point.interpolate(lastPoint, nextPoint, f);
-            if (i === 0) {
-                context.moveTo(interpolatedPoint.x, interpolatedPoint.y);
-            } else {
-                context.lineTo(interpolatedPoint.x, interpolatedPoint.y);
-            }
+            canvas.addPointToLine(interpolatedPoint);
         }
 
-        context.stroke();
-        context.closePath();
+        canvas.endLine();
     }
 
     /**
@@ -150,22 +143,18 @@ class FourierSeries {
      *              Coefficients -order, -order+1, ..., 0, ..., +order will be used.
      * @param t Expected to be in [0, 1]
      */
-    public drawSegmentsToPoint(context: CanvasRenderingContext2D, order: number, t: TimeUnit): void {
+    public drawSegmentsToPoint(canvas: Canvas2D, order: number, t: TimeUnit): void {
         const point: Point = { x: 0, y: 0 };
-        const constantCoefficient = this.getCoefficients(0, 0)[0];
-        applyCoefficient(point, constantCoefficient, 0);
 
-        context.beginPath();
-        context.moveTo(point.x, point.y);
+        canvas.startLine();
 
-        const coefficients = this.getCoefficients(1, order);
+        const coefficients = this.getCoefficients(0, order);
         for (const coefficient of coefficients) {
             applyCoefficient(point, coefficient, t);
-            context.lineTo(point.x, point.y);
+            canvas.addPointToLine(point);
         }
 
-        context.stroke();
-        context.closePath();
+        canvas.endLine();
     }
 
     /**
@@ -174,16 +163,7 @@ class FourierSeries {
      *              Coefficients -order, -order+1, ..., 0, ..., +order will be used.
      * @param t Expected to be in [0, 1]
      */
-    public drawCirclesToPoint(context: CanvasRenderingContext2D, order: number, t: TimeUnit): void {
-        function drawCircle(center: Point, radius: number): void {
-            if (radius > 0.5) {
-                context.beginPath();
-                context.arc(center.x, center.y, radius, 0, TWO_PI);
-                context.closePath();
-                context.stroke();
-            }
-        }
-
+    public drawCirclesToPoint(canvas: Canvas2D, order: number, t: TimeUnit): void {
         const coefficients = this.getCoefficients(0, order);
         if (coefficients.length < 2) {
             return;
@@ -193,7 +173,7 @@ class FourierSeries {
 
         for (const coefficient of coefficients) {
             if (coefficient.n !== 0 && coefficient.n !== 1) {
-                drawCircle(point, coefficient.magnitude);
+                canvas.drawCircle(point, coefficient.magnitude);
             }
             applyCoefficient(point, coefficient, t);
         }

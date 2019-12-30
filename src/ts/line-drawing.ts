@@ -1,3 +1,4 @@
+import { Canvas2D } from "./canvas-2d";
 import { FourierSeries, IFourierCoefficient } from "./fourier-series";
 import * as Log from "./log";
 import { Parameters } from "./parameters";
@@ -46,34 +47,30 @@ class LineDrawing {
      * Draws the line portion between 0 and t.
      * @param t Expected to be in [0, 1]
      */
-    public draw(context: CanvasRenderingContext2D, t: TimeUnit): void {
-        context.beginPath();
-        context.moveTo(this.points[0].x, this.points[0].y);
-
+    public draw(canvas: Canvas2D, t: TimeUnit): void {
         const desiredLength: SpaceUnit = t * this.pathLength;
-
         let currentLength: SpaceUnit = 0;
 
-        let i: number;
-        for (i = 0; i < this.points.length - 1; i++) {
+        canvas.startLine();
+        canvas.addPointToLine(this.points[0]);
+
+        for (let i = 0; i < this.points.length - 1; i++) {
             const lastPoint = this.points[i];
             const nextPoint = this.points[i + 1];
             const segmentLength = Point.distance(lastPoint, nextPoint);
 
             if (currentLength + segmentLength < desiredLength) {
                 currentLength += segmentLength;
-                context.lineTo(nextPoint.x, nextPoint.y);
+                canvas.addPointToLine(nextPoint);
             } else {
                 const interpolationFactor = (desiredLength - currentLength) / segmentLength;
                 const finalPoint = Point.interpolate(lastPoint, nextPoint, interpolationFactor);
-                context.lineTo(finalPoint.x, finalPoint.y);
-                currentLength += Point.distance(lastPoint, finalPoint);
+                canvas.addPointToLine(finalPoint);
                 break;
             }
         }
 
-        context.stroke();
-        context.closePath();
+        canvas.endLine();
     }
 
     public computeFourierSeries(order: number): FourierSeries {

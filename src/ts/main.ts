@@ -73,30 +73,30 @@ function main(): void {
                     const previousWidth = context.lineWidth;
                     context.lineWidth = 2;
 
-                    drawing.draw(context, Parameters.isProgressiveMode ? maxT : t);
+                    drawing.draw(canvas2D, Parameters.isProgressiveMode ? maxT : t);
 
                     context.lineWidth = previousWidth;
                 }
 
                 if (Parameters.displayCircles) {
                     context.strokeStyle = Parameters.persistence ? "rgba(255,255,255,0.01)" : "rgba(255,255,255,0.3)";
-                    fourier.drawCirclesToPoint(context, Parameters.order, t);
+                    fourier.drawCirclesToPoint(canvas2D, Parameters.order, t);
                 }
 
                 if (Parameters.displayCurve) {
                     context.strokeStyle = "white";
-                    fourier.drawCurve(context, Parameters.order, t);
+                    fourier.drawCurve(canvas2D, Parameters.order, t);
                 }
 
                 if (Parameters.displaySegments) {
                     context.strokeStyle = Parameters.persistence ? "rgba(255,0,0,0.01)" : "red";
-                    fourier.drawSegmentsToPoint(context, Parameters.order, t);
+                    fourier.drawSegmentsToPoint(canvas2D, Parameters.order, t);
                 }
 
                 if (Parameters.isProgressiveMode) {
                     context.strokeStyle = Parameters.persistence ? "rgba(255,255,255,0.01)" : "white";
                     const order = Parameters.order * t / maxT;
-                    fourier.drawCurvePartialOrder(context, order, maxT);
+                    fourier.drawCurvePartialOrder(canvas2D, order, maxT);
                     setOrderIndicator(order);
                 }
             }
