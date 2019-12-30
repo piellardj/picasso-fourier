@@ -111,6 +111,12 @@
                     "checked": false
                 },
                 {
+                    "title": "Smooth",
+                    "type": "checkbox",
+                    "id": "smooth-checkbox-id",
+                    "checked": false
+                },
+                {
                     "title": "Close loop",
                     "type": "checkbox",
                     "id": "close-loop-checkbox-id",

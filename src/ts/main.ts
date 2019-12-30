@@ -94,8 +94,20 @@ function main(): void {
                 }
 
                 if (Parameters.isProgressiveMode) {
-                    context.strokeStyle = Parameters.persistence ? "rgba(255,255,255,0.01)" : "white";
-                    const order = Parameters.order * t / maxT;
+                    let order = Parameters.order * t / maxT;
+
+                    if (!Parameters.smooth) {
+                        order = Math.floor(order);
+                    }
+
+                    if (!Parameters.persistence) {
+                        context.strokeStyle = "white";
+                    } else if (Parameters.smooth) {
+                        context.strokeStyle = "rgba(255,255,255,0.01)";
+                    } else {
+                        context.strokeStyle = "rgba(255,255,255,0.03)";
+                    }
+
                     fourier.drawCurvePartialOrder(canvas2D, order, maxT);
                     setOrderIndicator(order);
                 }

@@ -15,6 +15,7 @@ const controlId = {
     MODE: "mode-picker-id",
     SPEED: "speed-range-id",
     PERSISTENCE: "persistence-checkbox-id",
+    SMOOTH: "smooth-checkbox-id",
     CLOSE_LOOP: "close-loop-checkbox-id",
     REPEAT: "loop-checkbox-id",
     RESET: "reset-button-id",
@@ -78,6 +79,7 @@ function parseAndApplyMode(newModes: string[]): void {
         mode = newMode;
 
         const isInstant = (mode === EMode.INSTANT);
+        Controls.setVisibility(controlId.SMOOTH, !isInstant);
         Controls.setVisibility(controlId.DISPLAY_CIRCLES, isInstant);
         Controls.setVisibility(controlId.DISPLAY_SEGMENTS, isInstant);
         Controls.setVisibility(controlId.DISPLAY_CURVE, isInstant);
@@ -101,6 +103,11 @@ Range.addObserver(controlId.SPEED, (s: number) => {
 let persistence: boolean = Checkbox.isChecked(controlId.PERSISTENCE);
 Checkbox.addObserver(controlId.PERSISTENCE, (checked: boolean) => {
     persistence = checked;
+});
+
+let smooth: boolean = Checkbox.isChecked(controlId.SMOOTH);
+Checkbox.addObserver(controlId.SMOOTH, (checked: boolean) => {
+    smooth = checked;
 });
 
 let closeLoop: boolean = Checkbox.isChecked(controlId.CLOSE_LOOP);
@@ -171,6 +178,10 @@ class Parameters {
 
     public static get persistence(): boolean {
         return persistence;
+    }
+
+    public static get smooth(): boolean {
+        return smooth;
     }
 
     public static get closeLoop(): boolean {
