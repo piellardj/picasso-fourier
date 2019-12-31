@@ -375,7 +375,8 @@ const Canvas = (function() {
                 }
             }
 
-            if (isMouseDown && mouseWheelObservers.length > 0) {
+            const nbObservers = mouseMoveObservers.length + mouseDragObservers.length;
+            if (isMouseDown && nbObservers > 0) {
                 event.preventDefault();
             }
 
