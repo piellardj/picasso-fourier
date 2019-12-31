@@ -20,6 +20,8 @@ function main(): void {
     const context = canvas2D.context;
     context.lineWidth = 1;
 
+    Parameters.downloadObservers.push(() => canvas2D.download("picasso-fourier.png"));
+
     let drawing: LineDrawing = null;
     let fourier: FourierSeries = null;
 

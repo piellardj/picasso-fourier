@@ -25,6 +25,7 @@ const controlId = {
     DISPLAY_ORIGINAL_CURVE: "original-curve-checkbox-id",
     ORDER: "order-range-id",
     INDICATOR: "indicator-checkbox-id",
+    DOWNLOAD: "download-button-id",
 };
 
 enum EMode {
@@ -47,11 +48,13 @@ const observers: {
     redraw: GenericObserver[];
     speedChange: SpeedObserver[];
     presetChange: GenericObserver[];
+    download: GenericObserver[];
 } = {
     clear: [],
     redraw: [],
     speedChange: [],
     presetChange: [],
+    download: [],
 };
 
 /* === EVENTS BINDING ================================================= */
@@ -165,6 +168,8 @@ function updateIndicatorVisibility(): void {
 updateIndicatorVisibility();
 Checkbox.addObserver(controlId.INDICATOR, updateIndicatorVisibility);
 
+Button.addObserver(controlId.DOWNLOAD, () => callObservers(observers.download));
+
 /* === INTERFACE ====================================================== */
 /**
  * Class giving access to all the parameters of the application. Also gives access to event handlers.
@@ -250,6 +255,9 @@ class Parameters {
     }
     public static get presetObservers(): GenericObserver[] {
         return observers.presetChange;
+    }
+    public static get downloadObservers(): GenericObserver[] {
+        return observers.download;
     }
 
     private constructor() {}

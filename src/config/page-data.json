@@ -177,6 +177,12 @@
                     "type": "checkbox",
                     "id": "indicator-checkbox-id",
                     "checked": true
+                },
+                {
+                    "type": "button",
+                    "id": "download-button-id",
+                    "label": "Download",
+                    "flat": true
                 }
             ]
         }

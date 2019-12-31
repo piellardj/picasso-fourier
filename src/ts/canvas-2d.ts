@@ -64,6 +64,20 @@ class Canvas2D {
             this.isDrawingLine = false;
         }
     }
+
+    public download(filename: string): void {
+        if ((this.canvas as any).msToBlob) { // for IE
+            const blob = (this.canvas as any).msToBlob();
+            window.navigator.msSaveBlob(blob, filename);
+        } else {
+            this.canvas.toBlob((blob) => {
+                const link = document.createElement("a");
+                link.download = filename;
+                link.href = URL.createObjectURL(blob);
+                link.click();
+            });
+        }
+    }
 }
 
 export {
