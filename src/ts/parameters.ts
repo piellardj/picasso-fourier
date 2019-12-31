@@ -60,13 +60,12 @@ const observers: {
 /* === EVENTS BINDING ================================================= */
 
 /* --- PARAMETERS ----------------------------------------------------- */
-let isCustomPreset: boolean = false;
 let preset: EPreset;
 function tryParsePreset(p: string): void {
     const previousValue = preset;
     preset = p as EPreset;
 
-    if (isCustomPreset || preset !== previousValue) {
+    if (preset !== previousValue) {
         callObservers(observers.presetChange);
     }
 }
@@ -180,11 +179,8 @@ class Parameters {
     }
     public static setCustomPreset(): void {
         Picker.setValue(controlId.PRESET, null);
-        isCustomPreset = true;
-    }
-    public static restoreLastPreset(): void {
-        Picker.setValue(controlId.PRESET, preset.toString());
-        isCustomPreset = false;
+        preset = EPreset.CUSTOM;
+        callObservers(observers.presetChange);
     }
 
     public static get isProgressiveMode(): boolean {

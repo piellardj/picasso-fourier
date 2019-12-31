@@ -35,8 +35,8 @@ function main(): void {
             fourier = null;
             Canvas.showLoader(true);
 
+            Presets.setCustomPreset(UserInput.recordedPath, Canvas.getSize());
             Parameters.setCustomPreset();
-            loadPoints(UserInput.recordedPath);
         }
         needToRedraw = true;
     });
@@ -153,7 +153,6 @@ function main(): void {
 
         const canvasSize: number[] = Canvas.getSize();
         Canvas.showLoader(true);
-        Parameters.restoreLastPreset(); // in case we're exiting user input mode
         Presets.getPreset(Parameters.preset, canvasSize, loadPoints);
     }
 

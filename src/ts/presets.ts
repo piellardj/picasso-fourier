@@ -7,6 +7,7 @@ enum EPreset {
     ARLEQUIN = "arlequin",
     BULL = "bull",
     CAMEL = "camel",
+    CUSTOM = "<none>", // not available via interface
     DOG = "dog",
     DOVE = "dove",
     FLAMINGO = "flamingo",
@@ -50,9 +51,7 @@ class Presets {
             callback(copy);
         }
 
-        if (typeof Presets.cache === "undefined") {
-            Presets.cache = {};
-        } else if (typeof Presets.cache[preset] !== "undefined") {
+        if (typeof Presets.cache[preset] !== "undefined") {
             fromCache = true;
             safelyCallCallback(Presets.cache[preset]);
             return;
@@ -75,9 +74,27 @@ class Presets {
         xhr.send();
     }
 
+    public static setCustomPreset(points: Point[], canvasSize: number[]): void {
+        // Scale path to a PRESET_SIZE*PRESET_SIZE canvas.
+        // Depending on canvas aspect ratio it may not fit but it doesn't matter
+        const center: Point = {
+            x: 0.5 * canvasSize[0],
+            y: 0.5 * canvasSize[1],
+        };
+
+        const scaling = PRESET_SIZE / Math.min(canvasSize[0], canvasSize[1]);
+
+        for (const point of points) {
+            point.x = 0.5 * PRESET_SIZE + (point.x - center.x) * scaling;
+            point.y = 0.5 * PRESET_SIZE + (point.y - center.y) * scaling;
+        }
+
+        Presets.cache[EPreset.CUSTOM] = points;
+    }
+
     private static cache: {
         [propName: string]: Point[];
-    };
+    } = {};
 
     private static tryParsePointsArray(text: string): Point[] | null {
         if (!text) {
