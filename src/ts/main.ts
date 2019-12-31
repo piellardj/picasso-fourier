@@ -6,6 +6,7 @@ import { Parameters } from "./parameters";
 import { Point } from "./point";
 import { Presets } from "./presets";
 import { TimeUnit } from "./units";
+import * as UserInput from "./user-input";
 
 declare const Canvas: any;
 
@@ -26,13 +27,28 @@ function main(): void {
 
     let needToRestart = true;
     Parameters.clearObservers.push(() => needToRestart = true);
+    UserInput.finishedAcquisitionCallbacks.push((isValid: boolean) => {
+        if (isValid) {
+            drawing = null;
+            fourier = null;
+            Canvas.showLoader(true);
+
+            Parameters.setCustomPreset();
+            loadPoints(UserInput.recordedPath);
+        }
+        needToRedraw = true;
+    });
 
     let needToRedraw = true;
     Parameters.redrawObservers.push(() => needToRedraw = true);
 
     const loopDuration = 2000; // milliseconds, at normal speed
     function mainLoop(): void {
-        if (drawing !== null && fourier !== null) { // checks that preset is loaded
+        if (UserInput.isRecording()) {
+            canvas2D.clear();
+            context.strokeStyle = "white";
+            UserInput.drawCurrentPath(canvas2D);
+        } else if (drawing !== null && fourier !== null) { // checks that preset is loaded
             let t: TimeUnit = clock.current / loopDuration;
             const maxT: TimeUnit = Parameters.closeLoop ? 1 : drawing.originalPathDuration;
             let finishedLoop = (t >= maxT);
@@ -110,7 +126,7 @@ function main(): void {
                     } else {
                         fourier.drawCurvePartialOrder(canvas2D, order, maxT);
                     }
-                    
+
                     setOrderIndicator(order);
                 }
             }
@@ -121,19 +137,22 @@ function main(): void {
         requestAnimationFrame(mainLoop);
     }
 
+    function loadPoints(points: Point[]): void {
+        drawing = new LineDrawing(points);
+        fourier = drawing.computeFourierSeries(300 + 1); // one more to avoid out of bounds exceptions
+        needToRestart = true;
+        clock.reset();
+        Canvas.showLoader(false);
+    }
+
     function loadPreset(): void {
         drawing = null;
         fourier = null;
 
         const canvasSize: number[] = Canvas.getSize();
         Canvas.showLoader(true);
-        Presets.getPreset(Parameters.preset, canvasSize, (points: Point[]) => {
-            drawing = new LineDrawing(points);
-            fourier = drawing.computeFourierSeries(300 + 1); // one more to avoid out of bounds exceptions
-            needToRestart = true;
-            clock.reset();
-            Canvas.showLoader(false);
-        });
+        Parameters.restoreLastPreset(); // in case we're exiting user input mode
+        Presets.getPreset(Parameters.preset, canvasSize, loadPoints);
     }
 
     Parameters.presetObservers.push(loadPreset);
