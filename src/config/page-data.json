@@ -171,6 +171,12 @@
                     "type": "checkbox",
                     "id": "original-curve-checkbox-id",
                     "checked": false
+                },
+                {
+                    "title": "Indicator",
+                    "type": "checkbox",
+                    "id": "indicator-checkbox-id",
+                    "checked": true
                 }
             ]
         }

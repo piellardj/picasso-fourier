@@ -1,7 +1,7 @@
 import { EPreset } from "./presets";
 
 declare const Button: any;
-// declare const Canvas: any;
+declare const Canvas: any;
 declare const Checkbox: any;
 declare const Controls: any;
 // declare const FileControl: any;
@@ -24,6 +24,7 @@ const controlId = {
     DISPLAY_CURVE: "curve-checkbox-id",
     DISPLAY_ORIGINAL_CURVE: "original-curve-checkbox-id",
     ORDER: "order-range-id",
+    INDICATOR: "indicator-checkbox-id",
 };
 
 enum EMode {
@@ -156,6 +157,13 @@ Range.addObserver(controlId.ORDER, (o: number) => {
     order = o;
     callObservers(observers.clear);
 });
+
+function updateIndicatorVisibility(): void {
+    const visible = Checkbox.isChecked(controlId.INDICATOR);
+    Canvas.setIndicatorsVisibility(visible);
+}
+updateIndicatorVisibility();
+Checkbox.addObserver(controlId.INDICATOR, updateIndicatorVisibility);
 
 /* === INTERFACE ====================================================== */
 /**
