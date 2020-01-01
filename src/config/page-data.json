@@ -114,7 +114,7 @@
                     "title": "Smooth",
                     "type": "checkbox",
                     "id": "smooth-checkbox-id",
-                    "checked": false
+                    "checked": true
                 },
                 {
                     "title": "Close loop",
