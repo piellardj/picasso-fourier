@@ -72,6 +72,10 @@ function main(): void {
             }
 
             if (needToRestart) {
+                if (Parameters.isProgressiveMode) {
+                    Parameters.resetZoom();
+                }
+
                 needToRestart = false;
                 clock.reset();
                 fourier.resetCurve();
