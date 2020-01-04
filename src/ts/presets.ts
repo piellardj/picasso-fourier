@@ -13,6 +13,7 @@ enum EPreset {
     FLAMINGO = "flamingo",
     HORSE = "horse",
     MOUSE = "mouse",
+    PENGUIN = "penguin",
     WOMAN1 = "woman1",
     WOMAN2 = "woman2",
 }

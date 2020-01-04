@@ -52,6 +52,10 @@
                             "label": "Woman 1"
                         },
                         {
+                            "value": "penguin",
+                            "label": "Penguin"
+                        },
+                        {
                             "value": "dove",
                             "label": "Dove"
                         },
