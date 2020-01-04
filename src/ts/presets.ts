@@ -4,7 +4,8 @@ import { StopWatch } from "./stopwatch";
 
 /* Enum values must match the values of the controls */
 enum EPreset {
-    ARLEQUIN = "arlequin",
+    ARLEQUIN1 = "arlequin1",
+    ARLEQUIN2 = "arlequin2",
     BULL = "bull",
     CAMEL = "camel",
     CUSTOM = "<none>", // not available via interface

@@ -31,13 +31,17 @@
                     "placeholder": "Custom",
                     "options": [
                         {
-                            "value": "arlequin",
-                            "label": "Arlequin",
+                            "value": "arlequin1",
+                            "label": "Arlequin 1",
                             "checked": true
                         },
                         {
                             "value": "bull",
                             "label": "Bull"
+                        },
+                        {
+                            "value": "arlequin2",
+                            "label": "Arlequin 2"
                         },
                         {
                             "value": "mouse",
