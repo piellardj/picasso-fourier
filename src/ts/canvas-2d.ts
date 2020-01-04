@@ -12,15 +12,42 @@ class Canvas2D {
     private isDrawingLine: boolean = false;
     private nbPointsInLine: number = 0;
 
+    private viewportZoom: number;
+    private viewportCenter: Point; // point that should be at the center of the viewport
+    private viewportHalfWidth: number;
+    private viewportHalfHeight: number;
+
     public constructor(canvasElementId: string) {
         this.canvas = document.getElementById(canvasElementId) as HTMLCanvasElement;
         this.context = this.canvas.getContext("2d");
+
+        this.viewportZoom = 1;
+        this.viewportCenter = { x: 0, y: 0 };
+        this.viewportHalfWidth = 0.5 * this.canvas.width;
+        this.viewportHalfHeight = 0.5 * this.canvas.height;
+    }
+
+    public set center(p: Point) {
+        this.viewportCenter.x = p.x;
+        this.viewportCenter.y = p.y;
+    }
+
+    public set zoom(z: number) {
+        this.viewportZoom = z;
+    }
+
+    public setFullViewport(): void {
+        this.viewportZoom = 1;
+        this.viewportCenter.x = this.viewportHalfWidth;
+        this.viewportCenter.y = this.viewportHalfHeight;
     }
 
     public adjustSize(): void {
         if (this.canvas.width !== this.canvas.clientWidth || this.canvas.height !== this.canvas.clientHeight) {
             this.canvas.width = this.canvas.clientWidth;
             this.canvas.height = this.canvas.clientHeight;
+            this.viewportHalfWidth = 0.5 * this.canvas.width;
+            this.viewportHalfHeight = 0.5 * this.canvas.height;
         }
     }
 
@@ -29,9 +56,13 @@ class Canvas2D {
     }
 
     public drawCircle(center: Point, radius: number): void {
-        if (radius > 0.5) {
+        const visibleRadius = this.viewportZoom * radius
+        const x = this.viewportZoom * (center.x - this.viewportCenter.x) + this.viewportHalfWidth;
+        const y = this.viewportZoom * (center.y - this.viewportCenter.y) + this.viewportHalfHeight;
+
+        if (visibleRadius > 0.5) {
             this.context.beginPath();
-            this.context.arc(center.x, center.y, radius, 0, TWO_PI);
+            this.context.arc(x, y, visibleRadius, 0, TWO_PI);
             this.context.closePath();
             this.context.stroke();
         }
@@ -48,10 +79,13 @@ class Canvas2D {
     }
 
     public addPointToLine(point: Point): void {
+        const x = this.viewportZoom * (point.x - this.viewportCenter.x) + this.viewportHalfWidth;
+        const y = this.viewportZoom * (point.y - this.viewportCenter.y) + this.viewportHalfHeight;
+
         if (this.nbPointsInLine === 0) {
-            this.context.moveTo(point.x, point.y);
+            this.context.moveTo(x, y);
         } else {
-            this.context.lineTo(point.x, point.y);
+            this.context.lineTo(x, y);
         }
 
         this.nbPointsInLine++;

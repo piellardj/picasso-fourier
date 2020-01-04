@@ -179,6 +179,13 @@ class FourierSeries {
         }
     }
 
+    public computePoint(order: number, t: TimeUnit): Point {
+        const point: Point = { x: 0, y: 0 };
+        const coefficients = this.getCoefficients(0, order);
+        applyCoefficientsArray(point, coefficients, t);
+        return point;
+    }
+
     /**
      * Computes the partial curve between 0 and t in the given order.
      * The partial curve serves as cache and is as reused as possible.

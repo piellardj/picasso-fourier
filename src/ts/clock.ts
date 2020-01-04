@@ -23,7 +23,7 @@ class Clock {
             realTime: 0,
         };
 
-        Parameters.speedChangeObservers.push(() => this.setSpeed(Parameters.speed));
+        Parameters.speedChangeObservers.push(() => this.updateSpeed());
 
         this.reset();
     }
@@ -32,7 +32,7 @@ class Clock {
         this.paused = false;
         this.lastCheckpoint.clockTime = 0;
         this.lastCheckpoint.realTime = performance.now();
-        this.setSpeed(Parameters.speed);
+        this.updateSpeed();
     }
 
     public setSpeed(speed: number): void {
@@ -69,6 +69,10 @@ class Clock {
     private createCheckpoint(): void {
         this.lastCheckpoint.clockTime = this.current;
         this.lastCheckpoint.realTime = performance.now();
+    }
+
+    private updateSpeed(): void {
+        this.setSpeed(Parameters.speed / Parameters.zoom);
     }
 }
 

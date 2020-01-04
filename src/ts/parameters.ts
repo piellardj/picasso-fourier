@@ -24,6 +24,7 @@ const controlId = {
     DISPLAY_CURVE: "curve-checkbox-id",
     DISPLAY_ORIGINAL_CURVE: "original-curve-checkbox-id",
     ORDER: "order-range-id",
+    ZOOM: "zoom-range-id",
     INDICATOR: "indicator-checkbox-id",
     DOWNLOAD: "download-button-id",
 };
@@ -35,7 +36,6 @@ enum EMode {
 
 /* === OBSERVERS ====================================================== */
 type GenericObserver = () => void;
-type SpeedObserver = (previousSpeed: number) => void;
 
 function callObservers(observersList: GenericObserver[]): void {
     for (const observer of observersList) {
@@ -46,7 +46,7 @@ function callObservers(observersList: GenericObserver[]): void {
 const observers: {
     clear: GenericObserver[];
     redraw: GenericObserver[];
-    speedChange: SpeedObserver[];
+    speedChange: GenericObserver[];
     presetChange: GenericObserver[];
     download: GenericObserver[];
 } = {
@@ -87,6 +87,7 @@ function parseAndApplyMode(newModes: string[]): void {
         Controls.setVisibility(controlId.DISPLAY_CIRCLES, isInstant);
         Controls.setVisibility(controlId.DISPLAY_SEGMENTS, isInstant);
         Controls.setVisibility(controlId.DISPLAY_CURVE, isInstant);
+        Controls.setVisibility(controlId.ZOOM, isInstant);
 
         callObservers(observers.clear);
     }
@@ -96,12 +97,8 @@ Tabs.addObserver(controlId.MODE, parseAndApplyMode);
 
 let speed: number = Range.getValue(controlId.SPEED);
 Range.addObserver(controlId.SPEED, (s: number) => {
-    const previous = speed;
     speed = s;
-
-    for (const observer of observers.speedChange) {
-        observer(previous);
-    }
+    callObservers(observers.speedChange);
 });
 
 let persistence: boolean = Checkbox.isChecked(controlId.PERSISTENCE);
@@ -158,6 +155,13 @@ let order: number = Range.getValue(controlId.ORDER);
 Range.addObserver(controlId.ORDER, (o: number) => {
     order = o;
     callObservers(observers.clear);
+});
+
+let zoom: number = Range.getValue(controlId.ZOOM);
+Range.addObserver(controlId.ZOOM, (z: number) => {
+    zoom = z;
+    callObservers(observers.redraw);
+    callObservers(observers.speedChange);
 });
 
 function updateIndicatorVisibility(): void {
@@ -230,6 +234,10 @@ class Parameters {
         return order;
     }
 
+    public static get zoom(): number {
+        return zoom;
+    }
+
     public static get integrationPrecision(): number {
         const integrationStepSize = 1; // one space-unit per integration step
         return 1 / integrationStepSize;
@@ -246,7 +254,7 @@ class Parameters {
     public static get redrawObservers(): GenericObserver[] {
         return observers.redraw;
     }
-    public static get speedChangeObservers(): SpeedObserver[] {
+    public static get speedChangeObservers(): GenericObserver[] {
         return observers.speedChange;
     }
     public static get presetObservers(): GenericObserver[] {

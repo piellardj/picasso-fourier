@@ -82,6 +82,13 @@ function main(): void {
             if (needToRedraw) {
                 canvas2D.adjustSize();
 
+                if (Parameters.isProgressiveMode || Parameters.zoom === 1) {
+                    canvas2D.setFullViewport();
+                } else {
+                    canvas2D.zoom = Parameters.zoom;
+                    canvas2D.center = fourier.computePoint(Parameters.order, t);
+                }
+
                 if (!Parameters.persistence) {
                     canvas2D.clear();
                 }
