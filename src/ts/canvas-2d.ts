@@ -56,7 +56,7 @@ class Canvas2D {
     }
 
     public drawCircle(center: Point, radius: number): void {
-        const visibleRadius = this.viewportZoom * radius
+        const visibleRadius = this.viewportZoom * radius;
         const x = this.viewportZoom * (center.x - this.viewportCenter.x) + this.viewportHalfWidth;
         const y = this.viewportZoom * (center.y - this.viewportCenter.y) + this.viewportHalfHeight;
 
