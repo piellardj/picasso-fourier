@@ -1,6 +1,6 @@
 {
     "title": "Picasso - Fourier",
-    "description": "ͯPLACEHOLDER DESCRIPTION",
+    "description": "Picasso's iconic single line drawings analyzed by Fourier Transform.",
     "introduction": [
         "The Fourier Transform is a mathematical process that breaks a complex signal into a sum of sines and cosines, which can be represented as rotating circles. The more circles are used, the more precise the approximation is.",
         "This project uses this tool to analyze some of Picasso's single line drawings. I picked sketches mostly from his iconic animals series, as well as his take on the traditional Arlequin character.",
