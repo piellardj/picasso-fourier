@@ -44,6 +44,26 @@ function main(): void {
     let needToRedraw = true;
     Parameters.redrawObservers.push(() => needToRedraw = true);
 
+    function loadPoints(points: Point[]): void {
+        drawing = new LineDrawing(points);
+        fourier = drawing.computeFourierSeries(300 + 1); // one more to avoid out of bounds exceptions
+        needToRestart = true;
+        clock.reset();
+        Canvas.showLoader(false);
+    }
+
+    function loadPreset(): void {
+        drawing = null;
+        fourier = null;
+
+        const canvasSize: number[] = Canvas.getSize();
+        Canvas.showLoader(true);
+        Presets.getPreset(Parameters.preset, canvasSize, loadPoints);
+    }
+
+    Parameters.presetObservers.push(loadPreset);
+    Canvas.Observers.canvasResize.push(loadPreset);
+
     const loopDuration = 2000; // milliseconds, at normal speed
     function mainLoop(): void {
         if (UserInput.isRecording()) {
@@ -151,26 +171,6 @@ function main(): void {
 
         requestAnimationFrame(mainLoop);
     }
-
-    function loadPoints(points: Point[]): void {
-        drawing = new LineDrawing(points);
-        fourier = drawing.computeFourierSeries(300 + 1); // one more to avoid out of bounds exceptions
-        needToRestart = true;
-        clock.reset();
-        Canvas.showLoader(false);
-    }
-
-    function loadPreset(): void {
-        drawing = null;
-        fourier = null;
-
-        const canvasSize: number[] = Canvas.getSize();
-        Canvas.showLoader(true);
-        Presets.getPreset(Parameters.preset, canvasSize, loadPoints);
-    }
-
-    Parameters.presetObservers.push(loadPreset);
-    Canvas.Observers.canvasResize.push(loadPreset);
 
     loadPreset();
     requestAnimationFrame(mainLoop);
