@@ -17,8 +17,7 @@ function setOrderIndicator(value: number): void {
 
 function main(): void {
     const canvas2D = new Canvas2D("canvas");
-    const context = canvas2D.context;
-    context.lineWidth = 1;
+    canvas2D.lineWidth = 1;
 
     Parameters.downloadObservers.push(() => canvas2D.download("picasso-fourier.png"));
 
@@ -70,7 +69,7 @@ function main(): void {
             canvas2D.clear();
             canvas2D.setFullViewport();
             Parameters.resetZoom();
-            context.strokeStyle = "white";
+            canvas2D.strokeStyle = "white";
             UserInput.drawCurrentPath(canvas2D);
         } else if (drawing !== null && fourier !== null) { // checks that preset is loaded
             let t: TimeUnit = clock.current / loopDuration;
@@ -120,27 +119,24 @@ function main(): void {
                 }
 
                 if (Parameters.displayOriginalCurve) {
-                    context.strokeStyle = "rgb(0,128,0)";
-                    const previousWidth = context.lineWidth;
-                    context.lineWidth = 2;
-
+                    canvas2D.strokeStyle = "rgb(0,128,0)";
+                    canvas2D.lineWidth = 3;
                     drawing.draw(canvas2D, Parameters.isProgressiveMode ? maxT : t);
-
-                    context.lineWidth = previousWidth;
+                    canvas2D.lineWidth = 1;
                 }
 
                 if (Parameters.displayCircles) {
-                    context.strokeStyle = Parameters.persistence ? "rgba(255,255,255,0.01)" : "rgba(255,255,255,0.3)";
+                    canvas2D.strokeStyle = Parameters.persistence ? "rgba(255,255,255,0.01)" : "rgba(255,255,255,0.3)";
                     fourier.drawCirclesToPoint(canvas2D, Parameters.order, t);
                 }
 
                 if (Parameters.displayCurve) {
-                    context.strokeStyle = "white";
+                    canvas2D.strokeStyle = "white";
                     fourier.drawCurve(canvas2D, Parameters.order, t);
                 }
 
                 if (Parameters.displaySegments) {
-                    context.strokeStyle = Parameters.persistence ? "rgba(255,0,0,0.01)" : "red";
+                    canvas2D.strokeStyle = Parameters.persistence ? "rgba(255,0,0,0.01)" : "red";
                     fourier.drawSegmentsToPoint(canvas2D, Parameters.order, t);
                 }
 
@@ -148,11 +144,11 @@ function main(): void {
                     let order = Parameters.order * t / maxT;
 
                     if (!Parameters.persistence) {
-                        context.strokeStyle = "white";
+                        canvas2D.strokeStyle = "white";
                     } else if (Parameters.smooth) {
-                        context.strokeStyle = "rgba(255,255,255,0.01)";
+                        canvas2D.strokeStyle = "rgba(255,255,255,0.01)";
                     } else {
-                        context.strokeStyle = "rgba(255,255,255,0.03)";
+                        canvas2D.strokeStyle = "rgba(255,255,255,0.03)";
                     }
 
                     if (!Parameters.smooth) {

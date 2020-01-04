@@ -6,9 +6,11 @@ const TWO_PI = 2 * Math.PI;
  * Class for instancing and using a 2D HTML Canvas.
  */
 class Canvas2D {
-    public readonly context: CanvasRenderingContext2D;
-
     private readonly canvas: HTMLCanvasElement;
+    private readonly context: CanvasRenderingContext2D;
+    private readonly cssPixel: number;
+
+    private wantedLineWidth: number = 1;
     private isDrawingLine: boolean = false;
     private nbPointsInLine: number = 0;
 
@@ -22,6 +24,7 @@ class Canvas2D {
     public constructor(canvasElementId: string) {
         this.canvas = document.getElementById(canvasElementId) as HTMLCanvasElement;
         this.context = this.canvas.getContext("2d");
+        this.cssPixel = window.devicePixelRatio || 1;
 
         this.viewportZoom = 1;
         this.viewportCenter = { x: 0, y: 0 };
@@ -41,18 +44,28 @@ class Canvas2D {
 
     public setFullViewport(): void {
         this.viewportZoom = 1;
-        this.viewportCenter.x = 0.5 * this.canvas.width;
-        this.viewportCenter.y = 0.5 * this.canvas.height;
+        this.viewportCenter.x = 0.5 * this.canvas.width / this.cssPixel;
+        this.viewportCenter.y = 0.5 * this.canvas.height / this.cssPixel;
         this.precomputeTransformation();
     }
 
+    public set lineWidth(width: number) {
+        this.wantedLineWidth = this.cssPixel * width;
+        this.context.lineWidth = this.wantedLineWidth;
+    }
+
+    public set strokeStyle(style: string) {
+        this.context.strokeStyle = style;
+    }
+
     public adjustSize(): void {
-        if (this.canvas.width !== this.canvas.clientWidth || this.canvas.height !== this.canvas.clientHeight) {
-            this.canvas.width = this.canvas.clientWidth;
-            this.canvas.height = this.canvas.clientHeight;
-            this.viewportCenter.x = 0.5 * this.canvas.width;
-            this.viewportCenter.y = 0.5 * this.canvas.height;
-            this.precomputeTransformation();
+        const actualWidth = this.cssPixel * this.canvas.clientWidth;
+        const actualHeight = this.cssPixel * this.canvas.clientHeight;
+
+        if (this.canvas.width !== actualWidth || this.canvas.height !== actualHeight) {
+            this.canvas.width = actualWidth;
+            this.canvas.height = actualHeight;
+            this.setFullViewport();
         }
     }
 
@@ -78,6 +91,7 @@ class Canvas2D {
             this.endLine();
         }
 
+        this.context.lineWidth = this.wantedLineWidth;
         this.context.beginPath();
         this.isDrawingLine = true;
         this.nbPointsInLine = 0;
@@ -121,9 +135,9 @@ class Canvas2D {
     }
 
     private precomputeTransformation(): void {
-        this.scale = this.viewportZoom;
-        this.translateX = -this.viewportZoom * this.viewportCenter.x + 0.5 * this.canvas.width;
-        this.translateY = -this.viewportZoom * this.viewportCenter.y + 0.5 * this.canvas.height;
+        this.scale = this.cssPixel * this.viewportZoom;
+        this.translateX = this.cssPixel * (-this.viewportZoom * this.viewportCenter.x) + 0.5 * this.canvas.width;
+        this.translateY = this.cssPixel * (-this.viewportZoom * this.viewportCenter.y) + 0.5 * this.canvas.height;
     }
 }
 
