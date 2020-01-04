@@ -76,7 +76,7 @@ class LineDrawing {
     public computeFourierSeries(order: number): FourierSeries {
         const stopwatch = new StopWatch();
 
-        const nbSteps = Math.ceil(Parameters.integrationPrecision * this.pathLength);
+        const nbSteps = Math.max(200, Math.ceil(Parameters.integrationPrecision * this.pathLength));
         const stepSize = this.pathLength / nbSteps;
         const dT = 1 / nbSteps;
 
