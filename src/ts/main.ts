@@ -48,6 +48,8 @@ function main(): void {
     function mainLoop(): void {
         if (UserInput.isRecording()) {
             canvas2D.clear();
+            canvas2D.setFullViewport();
+            Parameters.resetZoom();
             context.strokeStyle = "white";
             UserInput.drawCurrentPath(canvas2D);
         } else if (drawing !== null && fourier !== null) { // checks that preset is loaded

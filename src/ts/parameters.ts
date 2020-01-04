@@ -237,6 +237,10 @@ class Parameters {
     public static get zoom(): number {
         return zoom;
     }
+    public static resetZoom(): void {
+        zoom = 1;
+        Range.setValue(controlId.ZOOM, zoom);
+    }
 
     public static get integrationPrecision(): number {
         const integrationStepSize = 1; // one space-unit per integration step
