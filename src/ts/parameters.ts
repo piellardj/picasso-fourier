@@ -1,13 +1,6 @@
 import { EPreset } from "./presets";
 
-declare const Button: any;
-declare const Canvas: any;
-declare const Checkbox: any;
-declare const Controls: any;
-// declare const FileControl: any;
-declare const Picker: any;
-declare const Range: any;
-declare const Tabs: any;
+import "./page-interface-generated";
 
 /* === IDs ============================================================ */
 const controlId = {
@@ -69,8 +62,8 @@ function tryParsePreset(p: string): void {
         callObservers(observers.presetChange);
     }
 }
-Picker.addObserver(controlId.PRESET, tryParsePreset);
-tryParsePreset(Picker.getValue(controlId.PRESET));
+Page.Picker.addObserver(controlId.PRESET, tryParsePreset);
+tryParsePreset(Page.Picker.getValue(controlId.PRESET));
 
 let mode: EMode;
 function parseAndApplyMode(newModes: string[]): void {
@@ -83,36 +76,36 @@ function parseAndApplyMode(newModes: string[]): void {
         mode = newMode;
 
         const isInstant = (mode === EMode.INSTANT);
-        Controls.setVisibility(controlId.SMOOTH, !isInstant);
-        Controls.setVisibility(controlId.DISPLAY_CIRCLES, isInstant);
-        Controls.setVisibility(controlId.DISPLAY_SEGMENTS, isInstant);
-        Controls.setVisibility(controlId.DISPLAY_CURVE, isInstant);
-        Controls.setVisibility(controlId.ZOOM, isInstant);
+        Page.Controls.setVisibility(controlId.SMOOTH, !isInstant);
+        Page.Controls.setVisibility(controlId.DISPLAY_CIRCLES, isInstant);
+        Page.Controls.setVisibility(controlId.DISPLAY_SEGMENTS, isInstant);
+        Page.Controls.setVisibility(controlId.DISPLAY_CURVE, isInstant);
+        Page.Controls.setVisibility(controlId.ZOOM, isInstant);
 
         callObservers(observers.clear);
     }
 }
-parseAndApplyMode(Tabs.getValues(controlId.MODE));
-Tabs.addObserver(controlId.MODE, parseAndApplyMode);
+parseAndApplyMode(Page.Tabs.getValues(controlId.MODE));
+Page.Tabs.addObserver(controlId.MODE, parseAndApplyMode);
 
-let speed: number = Range.getValue(controlId.SPEED);
-Range.addObserver(controlId.SPEED, (s: number) => {
+let speed: number = Page.Range.getValue(controlId.SPEED);
+Page.Range.addObserver(controlId.SPEED, (s: number) => {
     speed = s;
     callObservers(observers.speedChange);
 });
 
-let persistence: boolean = Checkbox.isChecked(controlId.PERSISTENCE);
-Checkbox.addObserver(controlId.PERSISTENCE, (checked: boolean) => {
+let persistence: boolean = Page.Checkbox.isChecked(controlId.PERSISTENCE);
+Page.Checkbox.addObserver(controlId.PERSISTENCE, (checked: boolean) => {
     persistence = checked;
 });
 
-let smooth: boolean = Checkbox.isChecked(controlId.SMOOTH);
-Checkbox.addObserver(controlId.SMOOTH, (checked: boolean) => {
+let smooth: boolean = Page.Checkbox.isChecked(controlId.SMOOTH);
+Page.Checkbox.addObserver(controlId.SMOOTH, (checked: boolean) => {
     smooth = checked;
 });
 
-let closeLoop: boolean = Checkbox.isChecked(controlId.CLOSE_LOOP);
-Checkbox.addObserver(controlId.CLOSE_LOOP, (checked: boolean) => {
+let closeLoop: boolean = Page.Checkbox.isChecked(controlId.CLOSE_LOOP);
+Page.Checkbox.addObserver(controlId.CLOSE_LOOP, (checked: boolean) => {
     closeLoop = checked;
 
     if (mode === EMode.PROGRESSIVE) {
@@ -120,58 +113,58 @@ Checkbox.addObserver(controlId.CLOSE_LOOP, (checked: boolean) => {
     }
 });
 
-let repeat: boolean = Checkbox.isChecked(controlId.REPEAT);
-Checkbox.addObserver(controlId.REPEAT, (checked: boolean) => {
+let repeat: boolean = Page.Checkbox.isChecked(controlId.REPEAT);
+Page.Checkbox.addObserver(controlId.REPEAT, (checked: boolean) => {
     repeat = checked;
 });
 
-Button.addObserver(controlId.RESET, () => callObservers(observers.clear));
+Page.Button.addObserver(controlId.RESET, () => callObservers(observers.clear));
 
-let displayCircles: boolean = Checkbox.isChecked(controlId.DISPLAY_CIRCLES);
-Checkbox.addObserver(controlId.DISPLAY_CIRCLES, (checked: boolean) => {
+let displayCircles: boolean = Page.Checkbox.isChecked(controlId.DISPLAY_CIRCLES);
+Page.Checkbox.addObserver(controlId.DISPLAY_CIRCLES, (checked: boolean) => {
     displayCircles = checked;
     callObservers(observers.redraw);
 });
 
-let displaySegments: boolean = Checkbox.isChecked(controlId.DISPLAY_SEGMENTS);
-Checkbox.addObserver(controlId.DISPLAY_SEGMENTS, (checked: boolean) => {
+let displaySegments: boolean = Page.Checkbox.isChecked(controlId.DISPLAY_SEGMENTS);
+Page.Checkbox.addObserver(controlId.DISPLAY_SEGMENTS, (checked: boolean) => {
     displaySegments = checked;
     callObservers(observers.redraw);
 });
 
-let displayCurve: boolean = Checkbox.isChecked(controlId.DISPLAY_CURVE);
-Checkbox.addObserver(controlId.DISPLAY_CURVE, (checked: boolean) => {
+let displayCurve: boolean = Page.Checkbox.isChecked(controlId.DISPLAY_CURVE);
+Page.Checkbox.addObserver(controlId.DISPLAY_CURVE, (checked: boolean) => {
     displayCurve = checked;
     callObservers(observers.redraw);
 });
 
-let displayOriginalCurve: boolean = Checkbox.isChecked(controlId.DISPLAY_ORIGINAL_CURVE);
-Checkbox.addObserver(controlId.DISPLAY_ORIGINAL_CURVE, (checked: boolean) => {
+let displayOriginalCurve: boolean = Page.Checkbox.isChecked(controlId.DISPLAY_ORIGINAL_CURVE);
+Page.Checkbox.addObserver(controlId.DISPLAY_ORIGINAL_CURVE, (checked: boolean) => {
     displayOriginalCurve = checked;
     callObservers(observers.redraw);
 });
 
-let order: number = Range.getValue(controlId.ORDER);
-Range.addObserver(controlId.ORDER, (o: number) => {
+let order: number = Page.Range.getValue(controlId.ORDER);
+Page.Range.addObserver(controlId.ORDER, (o: number) => {
     order = o;
     callObservers(observers.clear);
 });
 
-let zoom: number = Range.getValue(controlId.ZOOM);
-Range.addObserver(controlId.ZOOM, (z: number) => {
+let zoom: number = Page.Range.getValue(controlId.ZOOM);
+Page.Range.addObserver(controlId.ZOOM, (z: number) => {
     zoom = z;
     callObservers(observers.redraw);
     callObservers(observers.speedChange);
 });
 
 function updateIndicatorVisibility(): void {
-    const visible = Checkbox.isChecked(controlId.INDICATOR);
-    Canvas.setIndicatorsVisibility(visible);
+    const visible = Page.Checkbox.isChecked(controlId.INDICATOR);
+    Page.Canvas.setIndicatorsVisibility(visible);
 }
 updateIndicatorVisibility();
-Checkbox.addObserver(controlId.INDICATOR, updateIndicatorVisibility);
+Page.Checkbox.addObserver(controlId.INDICATOR, updateIndicatorVisibility);
 
-Button.addObserver(controlId.DOWNLOAD, () => callObservers(observers.download));
+Page.FileControl.addDownloadObserver(controlId.DOWNLOAD, () => callObservers(observers.download));
 
 /* === INTERFACE ====================================================== */
 /**
@@ -182,7 +175,7 @@ class Parameters {
         return preset;
     }
     public static setCustomPreset(): void {
-        Picker.setValue(controlId.PRESET, null);
+        Page.Picker.setValue(controlId.PRESET, null);
         preset = EPreset.CUSTOM;
         callObservers(observers.presetChange);
     }
@@ -239,7 +232,7 @@ class Parameters {
     }
     public static resetZoom(): void {
         zoom = 1;
-        Range.setValue(controlId.ZOOM, zoom);
+        Page.Range.setValue(controlId.ZOOM, zoom);
     }
 
     public static get integrationPrecision(): number {

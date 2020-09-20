@@ -8,11 +8,11 @@ import { Presets } from "./presets";
 import { TimeUnit } from "./units";
 import * as UserInput from "./user-input";
 
-declare const Canvas: any;
+import "./page-interface-generated";
 
 function setOrderIndicator(value: number): void {
     value = Math.round(100 * value) / 100; // 2 digits max
-    Canvas.setIndicatorText("fourier-order", value.toLocaleString());
+    Page.Canvas.setIndicatorText("fourier-order", value.toLocaleString());
 }
 
 function main(): void {
@@ -32,9 +32,9 @@ function main(): void {
         if (isValid) {
             drawing = null;
             fourier = null;
-            Canvas.showLoader(true);
+            Page.Canvas.showLoader(true);
 
-            Presets.setCustomPreset(UserInput.recordedPath, Canvas.getSize());
+            Presets.setCustomPreset(UserInput.recordedPath, Page.Canvas.getSize());
             Parameters.setCustomPreset();
         }
         needToRedraw = true;
@@ -48,20 +48,20 @@ function main(): void {
         fourier = drawing.computeFourierSeries(300 + 1); // one more to avoid out of bounds exceptions
         needToRestart = true;
         clock.reset();
-        Canvas.showLoader(false);
+        Page.Canvas.showLoader(false);
     }
 
     function loadPreset(): void {
         drawing = null;
         fourier = null;
 
-        const canvasSize: number[] = Canvas.getSize();
-        Canvas.showLoader(true);
+        const canvasSize: number[] = Page.Canvas.getSize();
+        Page.Canvas.showLoader(true);
         Presets.getPreset(Parameters.preset, canvasSize, loadPoints);
     }
 
     Parameters.presetObservers.push(loadPreset);
-    Canvas.Observers.canvasResize.push(loadPreset);
+    Page.Canvas.Observers.canvasResize.push(loadPreset);
 
     const loopDuration = 2000; // milliseconds, at normal speed
     function mainLoop(): void {

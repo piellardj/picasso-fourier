@@ -24,7 +24,7 @@ class Canvas2D {
     public constructor(canvasElementId: string) {
         this.canvas = document.getElementById(canvasElementId) as HTMLCanvasElement;
         this.context = this.canvas.getContext("2d");
-        this.cssPixel = window.devicePixelRatio || 1;
+        this.cssPixel = window.devicePixelRatio ?? 1;
 
         this.viewportZoom = 1;
         this.viewportCenter = { x: 0, y: 0 };
