@@ -2,7 +2,7 @@
   "name": "picasso-fourier",
   "version": "0.0.1",
   "homepage": "https://piellardj.github.io/picasso-fourier",
-  "description": "DESCRIPTION_placeholder",
+  "description": "Picasso's iconic single line drawings analyzed by Fourier Transform.",
   "main": "build/index.js",
   "scripts": {
     "pre-commit": "npm run rebuild && npm run lint",
