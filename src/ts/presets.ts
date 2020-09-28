@@ -26,39 +26,32 @@ enum EState {
     LOADED,
 }
 
-type InternalCallback = () => unknown;
-
 interface ICachedPreset {
     state: EState;
     points: Point[];
-    internalCallbacks: InternalCallback[];
 }
+
+type PresetCallback = (array: Point[]) => unknown;
 
 /**
  * Class for retrieving on demand the preset drawings with AJAX requests.
  * Tries to minimize the request by using a memory cache.
  */
 class Presets {
-    public static getPreset(preset: EPreset, wantedSize: number[], callback: (array: Point[]) => unknown): void {
-        const interalCallback = () => {
-            const stopWatchResize = new StopWatch();
-            const copy = Presets.resizePreset(Presets.cache[preset].points, wantedSize[0], wantedSize[1]);
-            Log.message(`Resized preset '${preset}' in ${stopWatchResize.milliseconds} ms`);
-
-            callback(copy);
+    /* Pending callbacks (waiting on preset loading for instance) will be cancelled */
+    public static getPreset(preset: EPreset, wantedSize: number[], callback: PresetCallback): void {
+        // erase previously registered callbacks
+        Presets.lastRegisteredCallback = {
+            wantedPreset: preset,
+            wantedWidth: wantedSize[0],
+            wantedHeight: wantedSize[1],
+            callback,
         };
 
-        if (typeof Presets.cache[preset] !== "undefined") {
-            if (Presets.cache[preset].state === EState.LOADED) {
-                interalCallback();
-            } else {
-                Presets.cache[preset].internalCallbacks.push(interalCallback);
-            }
-        } else {
+        if (typeof Presets.cache[preset] === "undefined") { // preset never requested before
             Presets.cache[preset] = {
                 state: EState.LOADING,
                 points: [],
-                internalCallbacks: [interalCallback],
             };
 
             const stopWatchDownload = new StopWatch();
@@ -73,9 +66,7 @@ class Presets {
                         if (retrievedArray !== null) {
                             Presets.cache[preset].points = retrievedArray;
                             Presets.cache[preset].state = EState.LOADED;
-                            for (const internalCallback of Presets.cache[preset].internalCallbacks) {
-                                internalCallback();
-                            }
+                            Presets.tryCallRegisteredCallback();
                         } else {
                             Log.message(`Failed to parse download preset '${preset}'`);
                         }
@@ -86,6 +77,8 @@ class Presets {
             });
             xhr.open("GET", `resources/${preset}.txt`);
             xhr.send();
+        } else {
+            Presets.tryCallRegisteredCallback(); // maybe the preset is ready
         }
     }
 
@@ -107,13 +100,39 @@ class Presets {
         Presets.cache[EPreset.CUSTOM] = {
             state: EState.LOADED,
             points,
-            internalCallbacks: [],
         };
     }
 
     private static cache: {
         [propName: string]: ICachedPreset;
     } = {};
+
+    private static lastRegisteredCallback: {
+        wantedPreset: EPreset;
+        wantedWidth: number;
+        wantedHeight: number;
+        callback: PresetCallback;
+    } = null;
+
+    private static tryCallRegisteredCallback(): void {
+        if (Presets.lastRegisteredCallback !== null) {
+            const preset = Presets.lastRegisteredCallback.wantedPreset;
+            const isPresetLoaded = (typeof Presets.cache[preset] !== "undefined") &&
+                (Presets.cache[preset].state === EState.LOADED);
+
+            if (isPresetLoaded) {
+                const width = Presets.lastRegisteredCallback.wantedWidth;
+                const height = Presets.lastRegisteredCallback.wantedHeight;
+
+                const stopWatchResize = new StopWatch();
+                const resizedPreset = Presets.resizePreset(Presets.cache[preset].points, width, height);
+                Log.message(`Resized preset '${preset}' in ${stopWatchResize.milliseconds} ms`);
+
+                Presets.lastRegisteredCallback.callback(resizedPreset);
+                Presets.lastRegisteredCallback = null;
+            }
+        }
+    }
 
     private static resizePreset(points: Point[], width: number, height: number): Point[] {
         const scaling = Math.min(width, height) / PRESET_SIZE;
