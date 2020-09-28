@@ -3,7 +3,7 @@ import { Point } from "./point";
 
 import "./page-interface-generated";
 
-type Callback = (isValid: boolean) => any;
+type Callback = (isValid: boolean) => unknown;
 
 let currentPoints: Point[] = [];
 let isRecordingUserInput = false;

@@ -39,7 +39,7 @@ interface ICachedPreset {
  * Tries to minimize the request by using a memory cache.
  */
 class Presets {
-    public static getPreset(preset: EPreset, wantedSize: number[], callback: (array: Point[]) => any): void {
+    public static getPreset(preset: EPreset, wantedSize: number[], callback: (array: Point[]) => unknown): void {
         const interalCallback = () => {
             const stopWatchResize = new StopWatch();
             const copy = Presets.resizePreset(Presets.cache[preset].points, wantedSize[0], wantedSize[1]);
