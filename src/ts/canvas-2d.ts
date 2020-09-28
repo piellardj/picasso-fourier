@@ -1,5 +1,7 @@
 import { Point } from "./point";
 
+import "./page-interface-generated";
+
 const TWO_PI = 2 * Math.PI;
 
 /**
@@ -21,8 +23,8 @@ class Canvas2D {
     private translateX: number;
     private translateY: number;
 
-    public constructor(canvasElementId: string) {
-        this.canvas = document.getElementById(canvasElementId) as HTMLCanvasElement;
+    public constructor() {
+        this.canvas = Page.Canvas.getCanvas();
         this.context = this.canvas.getContext("2d");
         this.cssPixel = window.devicePixelRatio ?? 1;
 

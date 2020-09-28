@@ -16,7 +16,7 @@ function setOrderIndicator(value: number): void {
 }
 
 function main(): void {
-    const canvas2D = new Canvas2D("canvas");
+    const canvas2D = new Canvas2D();
     canvas2D.lineWidth = 1;
 
     Parameters.downloadObservers.push(() => canvas2D.download("picasso-fourier.png"));
