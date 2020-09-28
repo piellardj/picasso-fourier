@@ -21,59 +21,72 @@ enum EPreset {
 
 const PRESET_SIZE = 512; // a preset should be dimensionned for a 512 x 512 canvas
 
+enum EState {
+    LOADING,
+    LOADED,
+}
+
+type InternalCallback = () => unknown;
+
+interface ICachedPreset {
+    state: EState;
+    points: Point[];
+    internalCallbacks: InternalCallback[];
+}
+
 /**
  * Class for retrieving on demand the preset drawings with AJAX requests.
  * Tries to minimize the request by using a memory cache.
  */
 class Presets {
     public static getPreset(preset: EPreset, wantedSize: number[], callback: (array: Point[]) => any): void {
-        const stopwatch = new StopWatch();
-        let fromCache = false;
-
-        function safelyCallCallback(points: Point[]): void {
-            const scaling = Math.min(wantedSize[0] / PRESET_SIZE, wantedSize[1] / PRESET_SIZE);
-            const offsetX = 0.5 * (wantedSize[0] - PRESET_SIZE * scaling);
-            const offsetY = 0.5 * (wantedSize[1] - PRESET_SIZE * scaling);
-
-            /* Create a deep copy to keep the cache clean */
-            const copy: Point[] = [];
-            for (const point of points) {
-                copy.push({
-                    x: point.x * scaling + offsetX,
-                    y: point.y * scaling + offsetY,
-                });
-            }
-
-            if (fromCache) {
-                Log.message(`Retrieved preset '${preset}' from cache in ${stopwatch.milliseconds} ms`);
-            } else {
-                Log.message(`Downloaded preset '${preset}' in ${stopwatch.milliseconds} ms.`);
-            }
+        const interalCallback = () => {
+            const stopWatchResize = new StopWatch();
+            const copy = Presets.resizePreset(Presets.cache[preset].points, wantedSize[0], wantedSize[1]);
+            Log.message(`Resized preset '${preset}' in ${stopWatchResize.milliseconds} ms`);
 
             callback(copy);
-        }
+        };
 
         if (typeof Presets.cache[preset] !== "undefined") {
-            fromCache = true;
-            safelyCallCallback(Presets.cache[preset]);
-            return;
-        }
-
-        const xhr = new XMLHttpRequest();
-
-        xhr.addEventListener("readystatechange", () => {
-            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-                const retrievedArray = Presets.tryParsePointsArray(xhr.responseText);
-
-                if (retrievedArray !== null) {
-                    Presets.cache[preset] = retrievedArray;
-                    safelyCallCallback(Presets.cache[preset]);
-                }
+            if (Presets.cache[preset].state === EState.LOADED) {
+                interalCallback();
+            } else {
+                Presets.cache[preset].internalCallbacks.push(interalCallback);
             }
-        });
+        } else {
+            Presets.cache[preset] = {
+                state: EState.LOADING,
+                points: [],
+                internalCallbacks: [interalCallback],
+            };
 
-        xhr.open("GET", `resources/${preset}.txt`);
-        xhr.send();
+            const stopWatchDownload = new StopWatch();
+            const xhr = new XMLHttpRequest();
+            xhr.addEventListener("readystatechange", () => {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        Log.message(`Downloaded preset '${preset}' in ${stopWatchDownload.milliseconds} ms`);
+
+                        const retrievedArray = Presets.tryParsePointsArray(xhr.responseText);
+
+                        if (retrievedArray !== null) {
+                            Presets.cache[preset].points = retrievedArray;
+                            Presets.cache[preset].state = EState.LOADED;
+                            for (const internalCallback of Presets.cache[preset].internalCallbacks) {
+                                internalCallback();
+                            }
+                        } else {
+                            Log.message(`Failed to parse download preset '${preset}'`);
+                        }
+                    } else {
+                        Log.message(`Failed to download preset '${preset}'`);
+                    }
+                }
+            });
+            xhr.open("GET", `resources/${preset}.txt`);
+            xhr.send();
+        }
     }
 
     public static setCustomPreset(points: Point[], canvasSize: number[]): void {
@@ -91,19 +104,38 @@ class Presets {
             point.y = 0.5 * PRESET_SIZE + (point.y - center.y) * scaling;
         }
 
-        Presets.cache[EPreset.CUSTOM] = points;
+        Presets.cache[EPreset.CUSTOM] = {
+            state: EState.LOADED,
+            points,
+            internalCallbacks: [],
+        };
     }
 
     private static cache: {
-        [propName: string]: Point[];
+        [propName: string]: ICachedPreset;
     } = {};
+
+    private static resizePreset(points: Point[], width: number, height: number): Point[] {
+        const scaling = Math.min(width, height) / PRESET_SIZE;
+        const offsetX = 0.5 * (width - PRESET_SIZE * scaling);
+        const offsetY = 0.5 * (height - PRESET_SIZE * scaling);
+
+        /* Create a deep copy to keep the cache clean */
+        const copy: Point[] = [];
+        for (const point of points) {
+            copy.push({
+                x: point.x * scaling + offsetX,
+                y: point.y * scaling + offsetY,
+            });
+        }
+
+        return copy;
+    }
 
     private static tryParsePointsArray(text: string): Point[] | null {
         if (!text) {
             return null;
         }
-
-        const stopwatch = new StopWatch();
 
         const points: Point[] = [];
 
@@ -124,7 +156,6 @@ class Presets {
             return null;
         }
 
-        Log.message(`Parsed preset in ${stopwatch.milliseconds} ms.`);
         return points;
     }
 }
