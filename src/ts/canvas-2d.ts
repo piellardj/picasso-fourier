@@ -61,8 +61,8 @@ class Canvas2D {
     }
 
     public adjustSize(): void {
-        const actualWidth = this.cssPixel * this.canvas.clientWidth;
-        const actualHeight = this.cssPixel * this.canvas.clientHeight;
+        const actualWidth = Math.floor(this.cssPixel * this.canvas.clientWidth);
+        const actualHeight = Math.floor(this.cssPixel * this.canvas.clientHeight);
 
         if (this.canvas.width !== actualWidth || this.canvas.height !== actualHeight) {
             this.canvas.width = actualWidth;
