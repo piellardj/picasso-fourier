@@ -169,7 +169,7 @@ const data = {
                     min: 1,
                     max: 50,
                     value: 1,
-                    step: 1
+                    step: 0.01
                 },
                 {
                     type: Demopage.supportedControls.Checkbox,

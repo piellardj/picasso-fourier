@@ -151,10 +151,18 @@ Page.Range.addObserver(controlId.ORDER, (o: number) => {
 });
 
 let zoom: number = Page.Range.getValue(controlId.ZOOM);
-Page.Range.addObserver(controlId.ZOOM, (z: number) => {
+function updateZoom(z: number): void {
     zoom = z;
     callObservers(observers.redraw);
     callObservers(observers.speedChange);
+}
+Page.Range.addObserver(controlId.ZOOM, updateZoom);
+Page.Canvas.Observers.mouseWheel.push((delta: number) => {
+    const rawNewZoom = zoom * (1 + 0.1 * delta);
+    console.log(`${zoom}  -  ${rawNewZoom}`);
+    Page.Range.setValue(controlId.ZOOM, rawNewZoom);
+    updateZoom(Page.Range.getValue(controlId.ZOOM));
+    console.log(Page.Range.getValue(controlId.ZOOM));
 });
 
 function updateIndicatorVisibility(): void {
@@ -261,7 +269,7 @@ class Parameters {
         return observers.download;
     }
 
-    private constructor() {}
+    private constructor() { }
 }
 
 export {
