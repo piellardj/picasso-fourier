@@ -123,7 +123,7 @@ class Canvas2D {
     public download(filename: string): void {
         if ((this.canvas as any).msToBlob) { // for IE
             const blob = (this.canvas as any).msToBlob();
-            window.navigator.msSaveBlob(blob, filename);
+            (window.navigator as any).msSaveBlob(blob, filename);
         } else {
             this.canvas.toBlob((blob: Blob | null) => {
                 if (blob !== null) {
