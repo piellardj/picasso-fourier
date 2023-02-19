@@ -142,7 +142,7 @@ class LineDrawing {
             });
         }
 
-        Log.message(`Computed ${order} Fourier coefficient with ${nbSteps} integration steps ` +
+        Log.message(`Computed ${order} Fourier coefficients with ${nbSteps} integration steps ` +
             `in ${stopwatch.milliseconds} ms.`);
         return new FourierSeries(coefficients, this.pathLength);
     }
