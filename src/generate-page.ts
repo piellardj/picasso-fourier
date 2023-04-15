@@ -11,6 +11,10 @@ const data = {
         "You can try to be your own Picasso by drawing on the canvas."
     ],
     githubProjectName: "picasso-fourier",
+    readme: {
+        filepath: path.join(__dirname, "..", "README.md"),
+        branchName: "master"
+    },
     additionalLinks: [],
     scriptFiles: [
         "script/main.min.js"
