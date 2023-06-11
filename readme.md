@@ -9,6 +9,8 @@ You can try to be your own Picasso by drawing on the canvas.
 
 See it live [here](https://piellardj.github.io/picasso-fourier/).
 
+[![Donate](https://raw.githubusercontent.com/piellardj/piellardj.github.io/master/images/readme/donate-paypal.svg)](https://www.paypal.com/donate/?hosted_button_id=AF7H7GEJTL95E)
+
 ![Screenshot](src/readme/zoom-out.png)
 
 ## Details
